@@ -1,0 +1,29 @@
+.el-dialog__header{
+    background: #3876e6;
+    padding: 9px 0;
+    .el-dialog__title{
+        font-size: 16px;
+        color: #fff;
+    }
+    .el-dialog__headerbtn{
+        top: 9px;
+        right: 7px;
+        .el-dialog__close{
+            color: #3876e6;
+            background: #fff;
+            padding: 5px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 15px;
+            &:hover{
+               
+            }
+        }
+    }
+}
+.el-dialog__body{
+    padding-top: 30px;
+}
+.el-dialog__footer{
+    
+}

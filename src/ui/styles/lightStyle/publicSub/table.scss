@@ -1,0 +1,36 @@
+.fTableWrapper {
+    .current-row > td{
+        background: #C0DCF9 !important
+    }
+    .el-table__header{
+        .cell{
+            color: #888;
+            font-size: 14px;
+        }
+    }
+    .el-table__body{
+        .cell {
+            span{
+                color: #333;
+                font-size: 16px;
+            }
+           
+        }
+        .el-table__row.hover-row>td{
+            cursor: pointer;
+            background: #C0DCF9 !important
+            }
+    }
+    .el-table td, .el-table th{
+        padding: 19px 0;
+    }
+    .el-table td, .el-table th.is-leaf{
+        border-bottom: 1px solid #c7ccd2;
+    }
+    .el-table::before {
+        height: 0;
+    }
+    .el-table__fixed-right::before, .el-table__fixed::before{
+        height: 0;
+    }
+}

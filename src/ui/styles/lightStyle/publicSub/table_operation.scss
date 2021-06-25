@@ -1,0 +1,18 @@
+.operation .icon_box {
+        margin-right: 8px;
+        display: inline-block;
+        cursor: pointer;
+        padding: 0 3px;
+        border-radius: 50%;
+        &:hover{
+            background: #e5e5e5;
+        }
+    }
+    .empty_icon{
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+    }
+    .alreadyBind{
+        color: #0072C0 
+    }

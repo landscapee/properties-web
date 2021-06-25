@@ -1,0 +1,35 @@
+//收集数据表单
+.collect_form{
+    .el-input__inner{
+        height: 40px;
+        line-height: 40px;
+        font-size: 16px;
+        color: #222;
+    }
+    .el-form-item__label{
+        font-size: 16px;
+        color: #222;
+    }
+    .el-textarea__inner{
+        font-size: 16px;
+        color: #222;
+    }
+    .el-cascader{
+        width: 100%;
+    }
+    .el-select{
+        width: 100%;
+    }
+}
+.el-form-item.is-error .el-input__inner, .el-form-item.is-error .el-input__inner:focus, .el-form-item.is-error .el-textarea__inner, .el-form-item.is-error .el-textarea__inner:focus, .el-message-box__input input.invalid, .el-message-box__input input.invalid:focus{
+    border-color: #E93570;
+}
+.el-form-item__error{
+    color: #E93570;
+}
+.el-color-picker{
+    width: 100%;
+    .el-color-picker__trigger{
+        width: 100%;
+    }
+}

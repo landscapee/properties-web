@@ -1,0 +1,104 @@
+.title_describe{
+    overflow: hidden;
+    line-height: 22px;
+    margin-bottom: 15px;
+    padding-left: 5px;
+		.title_text {
+			font-size: 16px;
+			color: #fff;
+      font-weight: bold;
+      display: inline-block;
+      vertical-align: middle;
+      font-family: AlibabaPuHuiTiM;
+		}
+		.left_flg {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      line-height: 14px;
+      text-align: center;
+      border: 2px solid #4181e9;
+      vertical-align: middle;
+      margin-right: 5px;
+      transform: rotate(45deg);
+      position: relative;
+      .left_flg_bg {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        opacity: 0.4;
+        background: #3876e6;
+        // border: 2px solid #3876e6;
+        border-radius: 100%;
+        position: absolute;
+        top:2px;
+        left:2px;
+      }
+    }
+   }
+   .describe_title {
+    height: 32px;
+    line-height: 32px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #222222;
+    font-weight: bold;
+  }
+  .title_box{
+    display: flex;
+    align-items: center;
+
+    .resetFormSearch{
+      flex: 1;
+      padding-left: 10px;
+      display: flex;
+      .el-form-item{
+        margin-bottom:0px !important ;
+      }
+    }
+  }
+  .title_box {
+    height: 32px;
+    line-height: 32px;
+    margin-bottom: 15px;
+		.title_text {
+			font-size: 18px;
+			color:#fff;
+      font-weight: bold;
+      display: inline-block;
+      vertical-align: middle;
+      height: 18px;
+      line-height: 18px;
+		}
+		.title_text:before {
+			display: inline-block;
+			content: ' ';
+			width: 4px;
+			vertical-align: -1px;
+			height: 16px;
+			background: rgba(73, 147, 253, 1);
+			box-shadow: 0px 1px 4px 0px rgba(73, 147, 253, 0.4);
+			border-radius: 1px;
+			margin-right: 12px;
+		}
+		.title_button {
+			float: right;
+		}
+  }
+  // div class="title_box">
+	// 		<span class="title_text"></span>
+	// 		<el-form :inline="true" :inline-message="true" class="resetFormSearch">
+	// 			<el-form-item label="单元名称" :inline-message="true" clearable>
+	// 				<el-input maxlength="50" clearable @input="getList1" type="text" v-model="form.name" placeholder="请输入"></el-input>
+	// 			</el-form-item>
+	// 			<el-form-item label="单元编号" :inline-message="true" clearable>
+	// 				<el-input maxlength="50" @input="getList1" clearable type="text" v-model="form.code" placeholder="请输入"></el-input>
+	// 			</el-form-item>
+	// 			<el-form-item label="部门" :inline-message="true">
+	// 				<el-select size="mini" @change="getList1" v-model="form.deptId" clearable placeholder="请选择">
+	// 					<el-option v-for="item in deptData" :key="item.deptId" :label="item.name" :value="item.deptId"></el-option>
+	// 				</el-select>
+	// 			</el-form-item>
+	// 			<el-button class="add_btn" icon="el-icon-circle-plus" style="float:right" @click="handleAddClick()">新增</el-button>
+	// 		</el-form>
+	// 	</div>
