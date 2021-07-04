@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-04-08 10:08:25
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-06-24 10:37:37
+ * @LastEditTime: 2021-07-02 10:38:52
 -->
 <template>
   <div style="height:100%;width:100%">
@@ -25,17 +25,15 @@
               </span>
           </el-table-column>
       </Ftable>
-      <CreateParams ref="createParams"></CreateParams>
   </div>
 </template>
-
 <script>
 import Ftable from '@/components/table';
+import requestApi from '@/api/index.js';
 import getQueryVariable from '@/utils/getQueryVariable';
-import CreateParams from './components/CreateParams.vue'
 export default {
   name:'paramsDefine',
-  components:{Ftable,CreateParams},
+  components:{Ftable},
   data(){
     return {
       key:'',
@@ -50,10 +48,10 @@ export default {
         {type: 'index',label: '序号',align: 'center'},
         { prop: 'name', label: '参数名称', align: 'center' },
         { prop: 'code', label: '参数编码', align: 'center' },
-        { prop: 'name', label: '参数类型', align: 'center' },
-        { prop: 'code', label: '描述', align: 'center' },
-        { prop: 'name', label: '状态', align: 'center' },
-        { prop: 'code', label: '创建时间', align: 'center' },
+        { prop: 'type', label: '参数类型', align: 'center' },
+        { prop: 'comment', label: '描述', align: 'center' },
+        { prop: 'state', label: '状态', align: 'center' },
+        { prop: 'time', label: '创建时间', align: 'center' },
         { slot: 'operation' },
 	    ]
     }
@@ -69,15 +67,26 @@ export default {
     
   },
   methods:{
+    async deleteFn(id){
+      let res=await requestApi.parameterManage.delete({
+        method:'post',
+        data:{id}
+      })
+      if(res){
+        this.$message({
+          type:'success',
+          message:'删除成功'
+        })
+      }
+    },
     handleCreateParams(){
-      // this.$refs.createParams.open({
-      //   type:'add'
-      // })
       this.$router.push({
         path:'createParams'
       })
     },
-    handleClickDelete(row){},
+    handleClickDelete(row){
+      this.deleteFn(row.id)
+    },
     handleClickEdit(row){},
     handleCurrentChange(current){
       this.params.current=current
