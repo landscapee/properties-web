@@ -60,7 +60,7 @@
     "ol": "^6.4.3",
     "postal": "^2.0.5",
     "socket.io": "^2.3.0",
-    "sortablejs": "^1.13.0",
+    "sortablejs": "^1.14.0",
     "uuid": "^8.0.0",
     "validator": "^13.0.0",
     "vue": "^2.6.11",

@@ -1,27 +1,22 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-23 14:30:28
- * @LastEditTime: 2021-07-02 10:44:08
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-07-14 09:43:03
+ * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\index.vue
 -->
 <template>
    <div class="paramscustom">
       <div class="page_content"  v-if="paramsType==='TEXT'||paramsType==='OBJECT'">
-          <el-form :model="form" :rules="rules" ref="ruleForm" label-width="160px" class="collect_form">
-              <SingleValue v-if="paramsType==='TEXT'"></SingleValue>
-              <Object v-if="paramsType==='OBJECT'"></Object>
-              <el-form-item label="">
-                  <el-button type="primary" @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
-              </el-form-item>
-          </el-form>   
+            <SingleValue v-if="paramsType==='TEXT'" :paramsProperties='form.properties'></SingleValue>
+           <Object v-if="paramsType==='OBJECT'" :paramsProperties='form.properties'></Object>
       </div>
-      <List v-if="paramsType==='LIST'"></List>
-      <ListAddObject v-if="paramsType==='SUB_OBJECT'"></ListAddObject>
-      <ListAddList  v-if="paramsType==='SUB_LIST'"></ListAddList>
-      <TreeObject  v-if="paramsType==='TREE_OBJECT'"></TreeObject>
-      <TreeList  v-if="paramsType==='TREE_LIST'"></TreeList>
+      <List v-if="paramsType==='LIST'" :paramsProperties='form.properties'></List>
+      <ListAddObject v-if="paramsType==='SUB_OBJECT'" :parentId='parentId' :paramsProperties='form.properties'></ListAddObject>
+      <ListAddList  v-if="paramsType==='SUB_LIST'"  :parentId='parentId' :paramsProperties='form.properties'></ListAddList>
+      <TreeObject  v-if="paramsType==='TREE'" :parentId='parentId' :paramsProperties='form.properties'></TreeObject>
+      <TreeList  v-if="paramsType==='TREE_LIST'" :parentId='parentId' :paramsProperties='form.properties'></TreeList>
     </div>
 </template>
 <script>
@@ -33,32 +28,38 @@ import List from './components/List.vue'
 import Object from './components/Object.vue'
 import SingleValue from './components/SingleValue.vue'
 import getQueryVariable from '@/utils/getQueryVariable';
+import requestApi from '@/api/index.js';
 export default {
   name: 'paramscustom',
   components:{SingleValue,Object,List,ListAddObject,ListAddList,TreeObject,TreeList},
   data() { 
     return {
-        id:getQueryVariable('id').split('paramsType')[0],
-        form:{},
+        paramsId:getQueryVariable('id'),
+        form:{
+            properties:[]
+        },
         rules:{},
+        paramsType:'',
+        parentId:''
     }
   },
-  computed:{
-    paramsType:function(){
-      return getQueryVariable('id').split('paramsType')[1]
-    },
+  mounted(){
+       this.getParameterInfoFn()
   },
   methods:{
-     submitForm(){
-            this.$refs['ruleForm'].validate((valid) => {
-            if (valid) {
-               
-            } else {
-                console.error('error submit!!');
-                return false;
-            }
-            });
-        },
+     //
+     async getParameterInfoFn(){
+        let res= await requestApi.parameterManage.getParameterInfo({
+            method:'postquery',
+            repeat:true,
+            params:{id:this.paramsId}
+         });
+         if(res){
+             this.paramsType=res.type;
+             this.form.properties=JSON.parse(res.properties);
+             this.parentId=res.parentId||'';
+         }
+     }, 
   }
  }
 </script>
@@ -67,6 +68,7 @@ export default {
 .paramscustom{
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 .page_header{
     width: 100%;

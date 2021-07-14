@@ -3,12 +3,12 @@
  * @Author: yang fu ren
  * @version: 
  * @Date: 2021-06-01 14:44:39
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-07-02 10:32:56
+ * @LastEditors: yang fu ren
+ * @LastEditTime: 2021-07-14 09:43:23
 -->
 <template>
     <div class="createParams">
-        <p class="page_header">创建参数</p>
+        <p class="page_header">{{isEdit?'编辑参数':'创建参数'}}</p>
         <div class="page_content">
             <el-form :model="form" :rules="rules" ref="ruleForm" label-width="160px" class="collect_form">
                 <el-form-item label="参数名称" prop="name">
@@ -18,7 +18,7 @@
                     <el-input v-model="form.code"  placeholder="请输入"></el-input>
                 </el-form-item>
                 <el-form-item label="参数类型" prop="type">
-                    <el-select v-model="form.type" placeholder="请选择">
+                    <el-select v-model="form.type" placeholder="请选择" @change="changeType">
                         <el-option
                             v-for="item in paramsList"
                             :key="item.code"
@@ -27,28 +27,30 @@
                         </el-option>
                     </el-select>
                 </el-form-item> 
-                <el-form-item label="数据类型" prop="type1">
-                    <el-select v-model="form.type1" placeholder="请选择">
+                <el-form-item  label="参数属性"  prop="properties2"  v-if="form.type==='TEXT'">
+                     <el-select v-model="form.properties2" placeholder="请选择" >
                         <el-option label="文本" value="text"></el-option>
                         <el-option label="数组" value="list"></el-option>
                         <el-option label="IP" value="ip"></el-option>
                         <el-option label="真假" value="boolean"></el-option>
                     </el-select>
-                </el-form-item> 
-                <el-form-item label="参数属性">
-                    <el-row >
-                        <el-col :span="6" style="margin-right: 5px;font-size:16px">属性名称</el-col>
-                        <el-col :span="6" style="margin-right: 5px;font-size:16px">属性编码</el-col>
-                        <el-col :span="6" style="margin-right: 5px;font-size:16px">属性类型</el-col>
+                </el-form-item>  
+                <el-form-item  label="参数属性"  prop="properties" v-else>
+                    <el-row>
+                        <el-col :span="3" style="margin-right: 5px;font-size:16px">属性名称</el-col>
+                        <el-col :span="3" style="margin-right: 5px;font-size:16px">属性编码</el-col>
+                        <el-col :span="3" style="margin-right: 5px;font-size:16px">属性类型</el-col>
+                        <el-col :span="3" style="margin-right: 5px;font-size:16px;text-align:center">展示字段</el-col>
+                        <el-col :span="3" style="margin-right: 5px;font-size:16px;text-align:center">值字段</el-col>
                     </el-row>
-                    <el-row v-for="(item,index) in form.properties">
-                        <el-col :span="6" style="margin-right: 5px">
+                    <el-row v-for="(item,index) in form.properties" :key="index">
+                        <el-col :span="3" style="margin-right: 5px">
                             <el-input v-model="item.name"  placeholder="请输入"></el-input>
                         </el-col>
-                        <el-col :span="6" style="margin-right: 5px">
+                        <el-col :span="3" style="margin-right: 5px">
                             <el-input v-model="item.code"  placeholder="请输入"></el-input>
                         </el-col>
-                        <el-col :span="6" style="margin-right: 5px">
+                        <el-col :span="3" style="margin-right: 5px">
                             <el-select v-model="item.type" placeholder="请选择">
                                 <el-option label="文本" value="text"></el-option>
                                 <el-option label="数组" value="list"></el-option>
@@ -56,6 +58,12 @@
                                 <el-option label="真假" value="boolean"></el-option>
                             </el-select>
                         </el-col>
+                        <el-col :span="3" style="margin-right: 5px;text-align:center">
+                            <el-checkbox v-model="item.isText" @change="changIsText(index)"></el-checkbox>
+                        </el-col> 
+                        <el-col :span="3" style="margin-right: 5px;text-align:center">
+                            <el-checkbox v-model="item.isValue" @change="changIsValue(index)"></el-checkbox>
+                        </el-col>    
                         <el-col :span="5" >
                             <span class="operation_icon" ><i @click="handleOperation('upload',index)" class="el-icon-upload2"></i></span>
                             <span class="operation_icon" ><i @click="handleOperation('download',index)" class="el-icon-download"></i></span>
@@ -63,7 +71,12 @@
                             <span class="operation_icon" ><i @click="handleOperation('add',index)" class="el-icon-circle-plus-outline"></i></span>
                         </el-col>
                     </el-row>
-                </el-form-item>    
+                </el-form-item> 
+                <el-form-item label="上级参数" prop="parentId" v-if="form.type==='SUB_OBJECT'||form.type==='SUB_LIST'||form.type==='TREE_LIST'">
+                     <el-select v-model="form.parentId" placeholder="请选择" >
+                        <el-option v-for="(item) in parentList" :label="item.name" :value="item.id" :key="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
                 <!-- <el-form-item label="高级特征">
                     <el-checkbox-group v-model="form.type">
                     <el-checkbox label="任意回滚" name="type"></el-checkbox>
@@ -89,27 +102,43 @@ import {cloneDeep} from 'lodash';
 export default {
     name:'createParams',
     data(){
+        var validatorParentId=(rule, value, callback)=>{
+            if(this.form.type==='SUB_OBJECT'||this.form.type==='SUB_LIST'){
+                if(!value){
+                    callback(new Error('请选择'));
+                }else{
+                    callback()
+                }
+            }else{
+                callback()
+            }
+        };
         return { 
+            paramsId:'',
+            isEdit:false,
+            parentList:[],
+            parentOptions:[],
+            checked:'',
             paramsList:[
                 {name:'单值',code:'TEXT'},
                 {name:'对象',code:'OBJECT'},
                 {name:'列表',code:'LIST'},
-                {name:'树型子对象',code:'TREE_OBJECT'},
+                {name:'树型',code:'TREE'},
                 {name:'树型子列表',code:'TREE_LIST'},
                 {name:'子对象',code:'SUB_OBJECT'},
                 {name:'子列表',code:'SUB_LIST'}
                 ],
             form:{
-                systemId:'',
-                parentId:localStorage.getItem('projectId'),
+                systemId:localStorage.getItem('projectId'),
                 name:'',
-                type:'',
-                type1:'',
+                type:'OBJECT',
                 properties:[
-                    {name:'',code:'',type:''}
+                    {name:'',code:'',type:'',isText:true,isValue:true}
                 ],
+                properties2:'',
                 comment:'',
                 position:'',
+                parentId:'',
             },
             fileList:[],
              rules:{
@@ -122,19 +151,65 @@ export default {
                 type: [
                     { required: true, message: '请输入', trigger: 'change' },
                 ],
+                parentId:[
+                    {  required: true, trigger: 'change',validator:validatorParentId },
+                ]
             }  
         }
     },
     mounted(){
-       // this.findAllProjectsFn();
+       let query=this.$route.query;
+       if(query.data){ //编辑
+            let data=JSON.parse(query.data);
+            this.paramsId=data.id;
+            this.isEdit=true;
+            if(data.type==='TEXT'){
+                this.form=Object.assign({},this.form,{
+                    systemId:data.systemId,
+                    name:data.name,
+                    type:data.type,
+                    code:data.code,
+                    comment:data.comment,
+                    properties2:JSON.parse(data.properties)[0].type,
+                    parentId:data.parentId||''
+                })
+            }else{
+                 this.form=Object.assign({},this.form,{
+                    systemId:data.systemId,
+                    name:data.name,
+                    type:data.type,
+                    code:data.code,
+                    comment:data.comment,
+                    properties:JSON.parse(data.properties),
+                    parentId:data.parentId||''
+                })
+            }
+       }else{
+           this.isEdit=false;
+       }
+       this.parentOptionsFn();
     },
     methods:{
+        async parentOptionsFn(){
+            let res=await requestApi.parameterManage.parentOptions({
+                method:'postquery',
+                params:{systemId:this.form.systemId}
+            });
+            if(res){
+                this.parentOptions=res
+            
+            }
+        },
         async addFn(){
             let data={
                 ...this.form
             };
+            if(this.form.type==='TEXT'){
+                data.properties=[{name:'',code:'',type:data.properties2}]
+            };
             data.properties=JSON.stringify(data.properties);
-            console.log(data)
+            delete data.properties2;
+         
             let res=await requestApi.parameterManage.add({
                 method:"post",
                 data
@@ -144,8 +219,59 @@ export default {
                     type:"success",
                     message:'保存成功'
                 })
-                this.$router.go(-1)
+                this.$router.go(-1);
+                window.parent.postMessage({
+                   state:'success'
+                }, '*');
             }
+        },
+        async updateFn(){
+            let data={
+                id:this.paramsId,
+                ...this.form
+            }
+            if(this.form.type==='TEXT'){
+                data.properties=[{name:'',code:'',type:data.properties2}]
+            };
+            data.properties=JSON.stringify(data.properties);
+            delete data.properties2;
+            let res = await requestApi.parameterManage.update({
+                method:'post',
+                data
+            });
+            if(res){
+                 this.$message({
+                    type:"success",
+                    message:'保存成功'
+                })
+                this.$router.go(-1);
+                 window.parent.postMessage({
+                   state:'success'
+                }, '*');
+            }
+        },
+        changeType(){
+            this.form.parentId='';
+            if(this.form.type==='SUB_OBJECT'||this.form.type==='SUB_LIST'){
+                this.parentList=this.parentOptions['LIST']
+            }else if(this.form.type==='TREE_LIST'){
+                this.parentList=this.parentOptions['TREE']
+            }
+           
+        },
+        changIsText(index){
+            this.form.properties.forEach((item,i)=>{
+                if(i!==index){
+                    item.isText=false
+                }
+            })
+        },
+        changIsValue(index){
+             this.form.properties.forEach((item,i)=>{
+                if(i!==index){
+                    item.isValue=false
+                }
+            })
         },
         tipsMessage(message) {
 			return this.$message({
@@ -170,7 +296,7 @@ export default {
                 }
             }
             if(type==='add'){
-                this.form.properties.splice(index+1,0,{name:'',code:'',type:''})    
+                this.form.properties.splice(index+1,0,{name:'',code:'',type:'',isText:'',isValue:''})    
             }else if(type==='remove'){
                 if(this.form.properties.length>1){
                     this.form.properties.splice(index,1)
@@ -190,13 +316,13 @@ export default {
             }
         },
         submitForm(){
-            window.parent.postMessage({
-                id: Date.parse(new Date())+'paramsType'+this.form.type,
-                name:this.form.name,
-            }, '*');
             this.$refs['ruleForm'].validate((valid) => {
             if (valid) {
-                this.addFn()
+                if(this.isEdit){
+                    this.updateFn()
+                }else{
+                     this.addFn();
+                }
             } else {
                 console.error('error submit!!');
                 return false;
@@ -243,7 +369,7 @@ export default {
 }
 .page_content{
     margin-top:26px;
-    width: 800px;
+    width: 1000px;
 }
 .service{
     .el-checkbox{

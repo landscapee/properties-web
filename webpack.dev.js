@@ -3,8 +3,8 @@
  * @version: 
  * @Author: xdh.ss
  * @Date: 2020-04-08 12:12:33
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-06-23 09:32:28
+ * @LastEditors: yang fu ren
+ * @LastEditTime: 2021-07-08 09:39:51
  */
 const merge = require('webpack-merge');
 const argv = require('yargs').argv;
@@ -29,10 +29,7 @@ module.exports = merge(common, {
         historyApiFallback: true,
         proxy: { // 代理
             "/api":{
-                target: "http://173.101.3.31:8000",
-                pathRewrite: {
-                    '^/api': ''
-                }
+                target: "http://173.101.3.113:18080",
             },
             "/project/api":{
                 target: "http://173.101.3.31:8089",

@@ -3,8 +3,8 @@
  * @Author: yang fu ren
  * @version: 
  * @Date: 2021-04-08 10:08:25
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-07-02 10:38:52
+ * @LastEditors: yang fu ren
+ * @LastEditTime: 2021-07-14 09:43:31
 -->
 <template>
   <div style="height:100%;width:100%">
@@ -42,7 +42,7 @@ export default {
         current:1
       },
       tableData:{
-          records:[{}],
+          records:[],
       },
       tableConfig:[
         {type: 'index',label: '序号',align: 'center'},
@@ -50,7 +50,6 @@ export default {
         { prop: 'code', label: '参数编码', align: 'center' },
         { prop: 'type', label: '参数类型', align: 'center' },
         { prop: 'comment', label: '描述', align: 'center' },
-        { prop: 'state', label: '状态', align: 'center' },
         { prop: 'time', label: '创建时间', align: 'center' },
         { slot: 'operation' },
 	    ]
@@ -63,20 +62,33 @@ export default {
     if(!localStorage.getItem('projectId')){
        localStorage.setItem('projectId', getQueryVariable('projectId'));
     }
-   
-    
+    this.getListFn()
   },
   methods:{
     async deleteFn(id){
       let res=await requestApi.parameterManage.delete({
-        method:'post',
-        data:{id}
+        method:'postquery',
+        params:{id}
       })
       if(res){
         this.$message({
           type:'success',
           message:'删除成功'
-        })
+        });
+        this.getListFn();
+        //通知父级重新获取菜单数据
+        window.parent.postMessage({
+            state:'success'
+        }, '*');
+      }
+    },
+    async getListFn(){
+      let res = await requestApi.parameterManage.getList({
+        method:'postquery',
+        params:{systemId:localStorage.getItem('projectId')}
+      });
+      if(res){
+        this.tableData=res;
       }
     },
     handleCreateParams(){
@@ -85,9 +97,28 @@ export default {
       })
     },
     handleClickDelete(row){
-      this.deleteFn(row.id)
+       this.$confirm(`是否删除?`, '提示', {
+				confirmButtonText: '确定',
+				cancelButtonText: '取消',
+				type: 'warning',
+			})
+				.then(() => {
+           this.deleteFn(row.id)
+				})
+				.catch((err) => {
+          console.log(err)
+					this.$message({
+						type: 'info',
+						message: '已取消删除',
+					});
+				});
     },
-    handleClickEdit(row){},
+    handleClickEdit(row){
+      this.$router.push({
+        path:'createParams',
+        query:{data:JSON.stringify(row)}
+      })
+    },
     handleCurrentChange(current){
       this.params.current=current
     },
