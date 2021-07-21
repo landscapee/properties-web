@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-03-31 14:08:41
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-13 16:39:49
+ * @LastEditTime: 2021-07-20 17:07:25
 -->
 <template>
 	<div id="tree">
@@ -20,7 +20,7 @@
             @node-drop="handleDrop"
             :expand-on-click-node='false'
             :props="defaultProps"
-            draggable
+            :draggable='config.draggable'
             :allow-drop="allowDrop"
             :allow-drag="allowDrag"
             @current-change="handleSelectChange"
@@ -31,6 +31,7 @@
                         placement="bottom"
                         width="70"
                         popper-class='layerManage_popover'
+                        trigger="hover"
                         v-if="config.operation"
                         >
                         <div class="popover_content" style="text-align: center; margin: 0">
@@ -63,9 +64,6 @@ export default {
     }
  },
  props:['treeData','config'],
- mounted(){
-   console.log(this.config.operation)
- },
  watch:{
    treeData(val) {
 			if (val && val.length) {
@@ -99,8 +97,6 @@ export default {
      this.$emit('handleSelect', data);
    },
     handleDrop(draggingNode, dropNode, dropType, ev) {
-        console.log(dropType);
-         console.log(ev);
         this.$emit('moveCategories',draggingNode,dropNode,dropType)
         //console.log('tree drop: ', dropNode.label, dropType);
       },

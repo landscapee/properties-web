@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 15:59:44
- * @LastEditTime: 2021-07-07 14:26:38
+ * @LastEditTime: 2021-07-19 15:54:49
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\SingleValue.vue
@@ -28,7 +28,6 @@
 <script>
 import {cloneDeep}  from 'lodash';
 import requestApi from '@/api/index.js';
-import getQueryVariable from '@/utils/getQueryVariable';
 export default {
   name: 'Object',
   props:['paramsProperties'],
@@ -48,7 +47,7 @@ export default {
       async getObjParameterFn(){
           let res = await requestApi.parameterManage.getObjParameter({
               method:'post',
-              data:{parameterId:getQueryVariable('id')}
+              data:{parameterId:this.$route.query.id}
           });
           if(res){
               if(res.code===200){ //表示没有值
@@ -69,7 +68,7 @@ export default {
       async setObjParameterFn(){
           let data={
               id:this.form.id,
-              parameterId:getQueryVariable('id'),
+              parameterId:this.$route.query.id,
               value:JSON.stringify(this.form.properties)
           };
           let res =await requestApi.parameterManage.setObjParameter({

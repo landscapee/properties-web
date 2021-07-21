@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-07-08 10:57:07
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-14 09:41:15
+ * @LastEditTime: 2021-07-20 10:46:16
 -->
 <template>
    <el-form :model="form"  ref="ruleForm" label-width="160px" class="collect_form">
@@ -61,14 +61,18 @@ export default {
     },
     methods:{
         async addTreeParameterFn(){
+            let data={
+                parameterId:this.form.parameterId,
+                parentDataId:this.form.parentDataId,
+                value:JSON.stringify(this.form.properties),
+                pid:this.form.pid,
+            }
+            if(!data.pid){
+                delete data.pid
+            }
             let res= await requestApi.parameterManage.addTreeParameter({
                 method:'post',
-                data:{
-                    parameterId:this.form.parameterId,
-                    parentDataId:this.form.parentDataId,
-                    value:JSON.stringify(this.form.properties),
-                    pid:this.form.pid,
-                }
+                data
             });
             if(res){
                 this.$message({

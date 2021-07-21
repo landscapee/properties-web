@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 16:40:26
- * @LastEditTime: 2021-07-14 09:41:28
+ * @LastEditTime: 2021-07-20 17:14:50
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\ListAddObject.vue
@@ -11,7 +11,7 @@
         <div class="classifyItems">
             <el-button type="primary" class="big_btn" icon="el-icon-circle-plus-outline" @click="handleAdd">添加</el-button>
             <div class="classifyItems_box">
-              <Tree  :treeData='treeData' @handleSelect='handleSelect' :config='treeConfig' @getCurrentNode='nodeOperation'></Tree>
+              <Tree  :treeData='treeData' @handleSelect='handleSelect' :config='treeConfig' @getCurrentNode='nodeOperation' @moveCategories='moveTreeNode'></Tree>
             </div>
         </div>
         <div class="classify_info">
@@ -27,7 +27,7 @@
                   >
                       <el-input v-model="item.value"  placeholder="请输入"></el-input>
                   </el-form-item>
-                  <el-form-item label="">
+                  <el-form-item label="" v-if="treeData.length">
                       <el-button type="primary" @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
                   </el-form-item>
             </el-form>
@@ -38,16 +38,16 @@
 <script>
 import Tree from '@/components/tree';
 import requestApi from '@/api/index.js';
-import getQueryVariable from '@/utils/getQueryVariable';
 export default {
   name: 'TreeObject',
   components:{Tree},
-  props:['parentId','paramsProperties'],
+  props:['paramsProperties'],
   data() { 
     return {
         treeNodeId:'',
         treeConfig:{
-            operation:true
+            operation:true,
+            draggable:true
         },
         treeData:[],
         form:{
@@ -57,14 +57,14 @@ export default {
     }
   },
   mounted(){
-    this.getTreeParameterFn()
+    this.getTreeParameterFn();
   },
   methods:{
     async updateTreeParameterFn(){
       let res = await requestApi.parameterManage.updateTreeParameter({
         method:'post',
         data:{
-          parameterId:getQueryVariable('id'),
+          parameterId:this.$route.query.id,
           value:JSON.stringify(this.form.properties),
           id:this.treeNodeId
         }
@@ -80,11 +80,15 @@ export default {
     async getTreeParameterFn(){
       let res =await requestApi.parameterManage.getTreeParameter({
         method:'post',
-        data:{parameterId:getQueryVariable('id')}
+        data:{parameterId:this.$route.query.id}
       });
       if(res){
+        
         if(res.length){
           this.treeData=this.handTreeData(res);
+        }else{
+          this.treeData=[];
+          this.form.properties=[]
         }
       }
     },
@@ -101,6 +105,24 @@ export default {
         this.getTreeParameterFn()
       }
     },
+    async moveTreeParameterFn(data){
+      let res=await requestApi.parameterManage.moveTreeParameter({
+        method:'post',
+        data,
+      })
+      if(res){
+        this.getTreeParameterFn()
+      }
+    },
+    moveTreeNode(draggingNode,dropNode,dropType){
+        let data={
+            id:draggingNode.data.id,
+            targetId:dropNode.data.id,
+            relative:dropType,
+        };
+      this.moveTreeParameterFn(data)
+     
+    },
     handTreeData(treeData){
       let tree=[];
       treeData.forEach(item => {
@@ -112,6 +134,8 @@ export default {
               name:active.value,
               id:item.id,
               parameterId:item.parameterId,
+              pid:item.pid,
+              position:item.position,
               value:item.value,
               children:[]
           }
@@ -125,7 +149,7 @@ export default {
     handleAdd(){
       this.$router.push({
         path:'addTree',
-        query:{properties:JSON.stringify(this.paramsProperties),parameterId:getQueryVariable('id'),pid:''}
+        query:{properties:JSON.stringify(this.paramsProperties),parameterId:this.$route.query.id,pid:''}
       })
     },
     //增加子节点
@@ -150,7 +174,7 @@ export default {
       }else{
         this.$router.push({
           path:'addTree',
-          query:{properties:JSON.stringify(this.paramsProperties),parameterId:getQueryVariable('id'),pid:this.treeNodeId}
+          query:{properties:JSON.stringify(this.paramsProperties),parameterId:this.$route.query.id,pid:this.treeNodeId}
         })
       }
     },

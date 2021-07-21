@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 16:40:26
- * @LastEditTime: 2021-07-14 09:41:58
+ * @LastEditTime: 2021-07-20 15:07:45
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\ListAddObject.vue
@@ -44,7 +44,7 @@
 <script>
 import requestApi from '@/api/index.js';
 import Ftable from '@/components/table';
-import getQueryVariable from '@/utils/getQueryVariable';
+import Sortable from 'sortablejs';
 export default {
   name: 'ListAddList',
   components:{Ftable},
@@ -82,7 +82,10 @@ export default {
        }
      });
      this.tableConfig.push(...tableConfig);
-      this.getListParameterFn()
+      this.getListParameterFn();
+       this.$nextTick(()=>{
+          this.rowDropTable()
+      })
   },
   methods:{
       //获取表格数据
@@ -90,7 +93,7 @@ export default {
         let res= await requestApi.parameterManage.getListParameter({
             method:"post",
             data:{
-                parameterId:getQueryVariable('id'),
+                parameterId:this.$route.query.id,
                 parentDataId:this.categoryId
             }
         });
@@ -136,6 +139,36 @@ export default {
             this.getListParameterCFn()
         }
     },
+     async moveListParameterFn(id,position){
+      let res=await requestApi.parameterManage.moveListParameter({
+        method:'post',
+        data:{
+          id,
+          position
+        }
+      });
+      if(res){
+        this.getListParameterCFn()
+      }
+    },
+     rowDropTable(){
+        const ele = document.querySelector('.el-table__body-wrapper tbody');
+        const _this = this;
+        Sortable.create(ele, {
+            onEnd({ newIndex, oldIndex }) {
+                  let id=_this.tableData[oldIndex].id;
+                  let targetId=_this.tableData[newIndex].id;
+                  let position=oldIndex>newIndex?'before':'after';
+                  let oldRow=_this.tableData[newIndex];
+                  console.log(oldRow);
+                  const currRow = _this.tableData.splice(oldIndex, 1)[0];
+                  console.log(currRow)
+                 
+                  _this.tableData.splice(newIndex, 0, currRow);
+                  _this.moveListParameterFn(currRow.id,oldRow.position)
+            },
+        });
+    },
     handleClickCategory(item){
         
         this.categoryId=item.id;
@@ -144,7 +177,7 @@ export default {
     handleAdd(){
         this.$router.push({
             path:'addListAddList',
-            query:{isEdit:false,parameterId:getQueryVariable('id'),parentDataId:this.categoryId},
+            query:{isEdit:false,parameterId:this.$route.query.id,parentDataId:this.categoryId},
         })
     },
     handleClickDelete(row){
@@ -165,7 +198,7 @@ export default {
     handleClickEdit(row){
         this.$router.push({
             path:'addListAddList',
-            query:{isEdit:true,parameterId:getQueryVariable('id'),parentDataId:this.categoryId,row:JSON.stringify(row)},
+            query:{isEdit:true,parameterId:this.$route.query.id,parentDataId:this.categoryId,row:JSON.stringify(row)},
         })
     },
     handleCurrentChange(current){

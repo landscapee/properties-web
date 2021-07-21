@@ -4,7 +4,7 @@
  * @Author: xdh.ss
  * @Date: 2020-04-08 12:12:33
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-08 09:39:51
+ * @LastEditTime: 2021-07-20 11:13:47
  */
 const merge = require('webpack-merge');
 const argv = require('yargs').argv;
@@ -23,7 +23,7 @@ module.exports = merge(common, {
     devServer: {
         port: port,
         open: false,
-        host:'127.0.0.1',
+        host:'0.0.0.0',
         progress: true, // 打包过程中的进度条
         noInfo: false, // 隐藏bundle信息
         historyApiFallback: true,

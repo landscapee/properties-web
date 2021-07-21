@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 16:40:26
- * @LastEditTime: 2021-07-14 09:41:00
+ * @LastEditTime: 2021-07-20 17:15:01
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\ListAddObject.vue
@@ -16,7 +16,7 @@
         <div class="classify_info">
            <div class="title_box">
                 <div style="margin-left: auto;">
-                    <el-button class="add_btn" type="primary"  @click="handleAdd">添加</el-button>
+                    <el-button class="add_btn" type="primary" v-if="treeData.length"  @click="handleAdd">添加</el-button>
                 </div>     
             </div>
             <Ftable :data="tableData" :tableConfig="tableConfig" :offsetTop="100" @handleSizeChange="handleSizeChange" @handleCurrentChange="handleCurrentChange">
@@ -39,7 +39,7 @@
 import Tree from '@/components/tree';
 import Ftable from '@/components/table';
 import requestApi from '@/api/index.js';
-import getQueryVariable from '@/utils/getQueryVariable';
+import Sortable from 'sortablejs';
 export default {
   name: 'TreeList',
   components:{Tree,Ftable},
@@ -49,7 +49,8 @@ export default {
         treeNodeId:'',
         treeData:[],
         treeConfig:{
-            operation:true
+            operation:true,
+            draggable:false
         },
         params:{
             size:10,
@@ -65,7 +66,7 @@ export default {
     }
   },
   mounted(){
-      let tableConfig=this.paramsProperties.map((item)=>{
+    let tableConfig=this.paramsProperties.map((item)=>{
        return {
          prop:item.code,
          label:item.name,
@@ -78,9 +79,12 @@ export default {
          },
          align:'center'
        }
-     });
-     this.tableConfig.push(...tableConfig);
-      this.getTreeParameterFn()
+    });
+    this.tableConfig.push(...tableConfig);
+    this.getTreeParameterFn();
+    this.$nextTick(()=>{
+        this.rowDropTable()
+    })
   },
   methods:{
     async getTreeParameterFn(){
@@ -99,7 +103,7 @@ export default {
         let res = await requestApi.parameterManage.getListParameter({
             method:'post',
             data:{
-                parameterId:getQueryVariable('id'),
+                parameterId:this.$route.query.id,
                 parentDataId:this.treeNodeId
             }
         });
@@ -120,10 +124,37 @@ export default {
             this.getListParameterFn()
         }
     },
+     async moveListParameterFn(id,position){
+      let res= requestApi.parameterManage.moveListParameter({
+        method:'post',
+        data:{
+          id,
+          position
+        }
+      });
+      if(res){
+        //this.getListParameterFn()
+      }
+    },
+     rowDropTable(){
+        const ele = document.querySelector('.el-table__body-wrapper tbody');
+        const _this = this;
+        Sortable.create(ele, {
+            onEnd({ newIndex, oldIndex }) {
+                //   let id=_this.tableData[oldIndex].id;
+                //   let targetId=_this.tableData[newIndex].id;
+                //   let position=oldIndex>newIndex?'before':'after';
+                  let oldRow=_this.tableData[newIndex];
+                  const currRow = _this.tableData.splice(oldIndex, 1)[0];
+                  _this.tableData.splice(newIndex, 0, currRow);
+                  _this.moveListParameterFn(currRow.id,oldRow.position)
+            },
+        });
+    },
     handleAdd(){
         this.$router.push({
             path:'addListAddList',
-            query:{isEdit:false,parameterId:getQueryVariable('id'),parentDataId:this.treeNodeId},
+            query:{isEdit:false,parameterId:this.$route.query.id,parentDataId:this.treeNodeId},
         })
     },
     handTreeData(treeData){
@@ -169,7 +200,7 @@ export default {
     handleClickEdit(row){
           this.$router.push({
             path:'addListAddList',
-            query:{isEdit:true,parameterId:getQueryVariable('id'),parentDataId:this.treeNodeId,row:JSON.stringify(row)},
+            query:{isEdit:true,parameterId:this.$route.query.id,parentDataId:this.treeNodeId,row:JSON.stringify(row)},
         })
     },
     handleCurrentChange(current){

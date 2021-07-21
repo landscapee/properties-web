@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 16:40:26
- * @LastEditTime: 2021-07-14 09:42:12
+ * @LastEditTime: 2021-07-20 17:16:32
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\ListAddObject.vue
@@ -30,8 +30,8 @@
                 >
                     <el-input v-model="item.value"  placeholder="请输入"></el-input>
                 </el-form-item>
-              <el-form-item label="">
-                  <el-button type="primary" @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
+              <el-form-item label="" v-if="categoryOptions.length">
+                  <el-button type="primary"  @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
               </el-form-item>
           </el-form>   
         </div>
@@ -49,23 +49,27 @@ export default {
         categoryId:'',
         categoryOptions:[],
         form:{
-            properties:[]
+            properties:[],
+            id:'',
         },
         rules:{},
         activeLeftIndex:0,
     }
   },
   mounted(){
-     
       this.getListParameterFn()
   },
   methods:{
     async setObjParameterFn(){
         let data={
-            parameterId:this.parentId,
+            parameterId:this.$route.query.id,
             parentDataId:this.categoryId,
             value:JSON.stringify(this.form.properties),
+            id:this.form.id,
         };
+        if(!data.id){
+            delete data.id
+        }
         let res= await requestApi.parameterManage.setObjParameter({
             method:'post',
             data
@@ -81,15 +85,16 @@ export default {
         let res= await requestApi.parameterManage.getObjParameter({
             method:'post',
             data:{
-                parameterId:this.parentId,
+                parameterId:this.$route.query.id,
                 parentDataId:this.categoryId
             }
         });
         if(res){
-          
             if(res.code===200){ //没有绑定值
+                this.form.id='';
                 this.form.properties=cloneDeep(this.paramsProperties)
             }else{
+                this.form.id=res.id
                 this.form.properties=JSON.parse(res.value)
             }
         }

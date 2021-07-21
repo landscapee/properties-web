@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 15:59:44
- * @LastEditTime: 2021-07-07 11:16:45
+ * @LastEditTime: 2021-07-20 16:11:07
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\SingleValue.vue
@@ -27,7 +27,6 @@
 <script>
 import {cloneDeep}  from 'lodash';
 import requestApi from '@/api/index.js';
-import getQueryVariable from '@/utils/getQueryVariable';
 export default {
   name: 'SingleValue',
   props:['paramsProperties'],
@@ -46,7 +45,7 @@ export default {
     async getTextParameterFn(){
       let res= await requestApi.parameterManage.getTextParameter({
         method:'post',
-        data:{parameterId:getQueryVariable('id')}
+        data:{parameterId:this.$route.query.id}
       });
       if(res){
         if(res.code===200){
@@ -67,7 +66,7 @@ export default {
     async setTextParameter(){
        let data={
               id:this.form.id,
-              parameterId:getQueryVariable('id'),
+              parameterId:this.$route.query.id,
               value:JSON.stringify(this.form.properties)
           };
           let res =await requestApi.parameterManage.setTextParameter({
@@ -96,5 +95,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  
 </style>

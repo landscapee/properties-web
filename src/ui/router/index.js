@@ -4,13 +4,21 @@
  * @version: 
  * @Date: 2021-03-29 10:23:11
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-08 11:02:20
+ * @LastEditTime: 2021-07-20 10:07:57
  */
 import Vue from 'vue'
 import Router from 'vue-router'
 Vue.use(Router)
 //菜单列表
 export const menuPermissions=[
+  {
+    path:'/',
+    component:() => import('@/views/paramsManage/paramsDefine/index'),
+    name:'参数定义管理',
+    code:'paramsDefine',
+    menuPermissions:'paramsDefine',
+    meta:{title:'参数定义管理',icon:'csgl'},
+  },
   {
     path:'/paramsDefine',
     component:() => import('@/views/paramsManage/paramsDefine/index'),
@@ -61,7 +69,7 @@ export const menuPermissions=[
   },
 ]
 export default new Router({
-  mode:'history',
+  //mode:'history',
 	fallback: false,
 	routes: menuPermissions
 })

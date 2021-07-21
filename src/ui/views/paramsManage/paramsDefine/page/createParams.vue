@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-06-01 14:44:39
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-14 09:43:23
+ * @LastEditTime: 2021-07-20 17:25:03
 -->
 <template>
     <div class="createParams">
@@ -125,8 +125,8 @@ export default {
                 {name:'列表',code:'LIST'},
                 {name:'树型',code:'TREE'},
                 {name:'树型子列表',code:'TREE_LIST'},
-                {name:'子对象',code:'SUB_OBJECT'},
-                {name:'子列表',code:'SUB_LIST'}
+                {name:'列表子对象',code:'SUB_OBJECT'},
+                {name:'列表子列表',code:'SUB_LIST'}
                 ],
             form:{
                 systemId:localStorage.getItem('projectId'),
@@ -137,7 +137,6 @@ export default {
                 ],
                 properties2:'',
                 comment:'',
-                position:'',
                 parentId:'',
             },
             fileList:[],
@@ -183,7 +182,10 @@ export default {
                     properties:JSON.parse(data.properties),
                     parentId:data.parentId||''
                 })
+                console.log(this.form.type)
+               
             }
+           
        }else{
            this.isEdit=false;
        }
@@ -196,8 +198,13 @@ export default {
                 params:{systemId:this.form.systemId}
             });
             if(res){
+                console.log(res)
                 this.parentOptions=res
-            
+                if(this.form.type==='SUB_OBJECT'||this.form.type==='SUB_LIST'){
+                    this.parentList=this.parentOptions['LIST']
+                }else if(this.form.type==='TREE_LIST'){
+                    this.parentList=this.parentOptions['TREE']
+                }
             }
         },
         async addFn(){

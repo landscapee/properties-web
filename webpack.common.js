@@ -3,8 +3,8 @@
  * @version: 
  * @Author: xdh.ss
  * @Date: 2020-04-08 12:12:15
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-06-24 10:31:05
+ * @LastEditors: yang fu ren
+ * @LastEditTime: 2021-07-20 10:11:33
  */
 
 const path = require('path');
@@ -30,7 +30,7 @@ const HtmlWebpackPluginConfig = {
 }
 
 if (argv.Program === 'fpms.dev' || argv.Program === 'fpms.build') {
-    html_webpack_plugin = new HtmlWebpackPlugin(_.extend(HtmlWebpackPluginConfig, {title: '青霄系统管理中心'}));
+    html_webpack_plugin = new HtmlWebpackPlugin(_.extend(HtmlWebpackPluginConfig, {title: '参数管理'}));
     indexJs = './index.js';
 }
 
@@ -45,9 +45,9 @@ module.exports = {
     ],
     output: {
         path: path.resolve(__dirname, 'build'),
-        filename: '[name].[hash].bundle.js',
-        chunkFilename: '[name].[hash].chunk.js',
-        publicPath: '/',
+        filename: '[name].bundle.js',
+        chunkFilename: '[name].chunk.js',
+        publicPath: "/parameter/",
         globalObject: 'this',
     },
     module: {

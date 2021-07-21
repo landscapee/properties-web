@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-04-08 10:08:25
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-14 09:43:31
+ * @LastEditTime: 2021-07-19 16:00:29
 -->
 <template>
   <div style="height:100%;width:100%">
@@ -30,7 +30,6 @@
 <script>
 import Ftable from '@/components/table';
 import requestApi from '@/api/index.js';
-import getQueryVariable from '@/utils/getQueryVariable';
 export default {
   name:'paramsDefine',
   components:{Ftable},
@@ -57,10 +56,10 @@ export default {
   },
   mounted(){
     if(!localStorage.getItem('token')){
-      localStorage.setItem('token', getQueryVariable('token'));
+      localStorage.setItem('token',this.$route.query.token);
     }
     if(!localStorage.getItem('projectId')){
-       localStorage.setItem('projectId', getQueryVariable('projectId'));
+       localStorage.setItem('projectId', this.$route.query.projectId);
     }
     this.getListFn()
   },

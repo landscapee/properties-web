@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-23 14:30:28
- * @LastEditTime: 2021-07-14 09:43:03
+ * @LastEditTime: 2021-07-20 17:15:10
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\index.vue
@@ -9,14 +9,14 @@
 <template>
    <div class="paramscustom">
       <div class="page_content"  v-if="paramsType==='TEXT'||paramsType==='OBJECT'">
-            <SingleValue v-if="paramsType==='TEXT'" :paramsProperties='form.properties'></SingleValue>
-           <Object v-if="paramsType==='OBJECT'" :paramsProperties='form.properties'></Object>
+            <SingleValue v-if="paramsType==='TEXT'" :paramsProperties='form.properties' :key="paramsId"></SingleValue>
+            <Object v-if="paramsType==='OBJECT'" :paramsProperties='form.properties' :key="paramsId"></Object>
       </div>
-      <List v-if="paramsType==='LIST'" :paramsProperties='form.properties'></List>
-      <ListAddObject v-if="paramsType==='SUB_OBJECT'" :parentId='parentId' :paramsProperties='form.properties'></ListAddObject>
-      <ListAddList  v-if="paramsType==='SUB_LIST'"  :parentId='parentId' :paramsProperties='form.properties'></ListAddList>
-      <TreeObject  v-if="paramsType==='TREE'" :parentId='parentId' :paramsProperties='form.properties'></TreeObject>
-      <TreeList  v-if="paramsType==='TREE_LIST'" :parentId='parentId' :paramsProperties='form.properties'></TreeList>
+      <List v-if="paramsType==='LIST'" :paramsProperties='form.properties' :key="paramsId"></List>
+      <ListAddObject v-if="paramsType==='SUB_OBJECT'" :parentId='parentId' :paramsProperties='form.properties' :key="paramsId"></ListAddObject>
+      <ListAddList  v-if="paramsType==='SUB_LIST'"  :parentId='parentId' :paramsProperties='form.properties' :key="paramsId"></ListAddList>
+      <TreeObject  v-if="paramsType==='TREE'" :parentId='parentId' :paramsProperties='form.properties' :key="paramsId"></TreeObject>
+      <TreeList  v-if="paramsType==='TREE_LIST'" :parentId='parentId' :paramsProperties='form.properties' :key="paramsId"></TreeList>
     </div>
 </template>
 <script>
@@ -27,24 +27,31 @@ import ListAddObject from './components/ListAddObject.vue'
 import List from './components/List.vue'
 import Object from './components/Object.vue'
 import SingleValue from './components/SingleValue.vue'
-import getQueryVariable from '@/utils/getQueryVariable';
 import requestApi from '@/api/index.js';
 export default {
   name: 'paramscustom',
   components:{SingleValue,Object,List,ListAddObject,ListAddList,TreeObject,TreeList},
   data() { 
     return {
-        paramsId:getQueryVariable('id'),
         form:{
             properties:[]
         },
         rules:{},
         paramsType:'',
-        parentId:''
+        parentId:'',
+        paramsId:'',
     }
   },
   mounted(){
        this.getParameterInfoFn()
+  },
+  watch:{
+      $route: {
+        handler() {
+             this.getParameterInfoFn()
+        },
+        deep: true,
+    }
   },
   methods:{
      //
@@ -52,12 +59,13 @@ export default {
         let res= await requestApi.parameterManage.getParameterInfo({
             method:'postquery',
             repeat:true,
-            params:{id:this.paramsId}
+            params:{id:this.$route.query.id}
          });
          if(res){
              this.paramsType=res.type;
              this.form.properties=JSON.parse(res.properties);
              this.parentId=res.parentId||'';
+             this.paramsId=this.$route.query.id
          }
      }, 
   }

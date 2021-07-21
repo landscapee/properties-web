@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-04-08 10:08:25
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-14 09:41:46
+ * @LastEditTime: 2021-07-20 16:55:36
 -->
 <template>
   <div style="height:100%;width:100%">
@@ -30,7 +30,6 @@
 
 <script>
 import requestApi from '@/api/index.js';
-import getQueryVariable from '@/utils/getQueryVariable';
 import Ftable from '@/components/table';
 import Sortable from 'sortablejs';
 export default {
@@ -78,7 +77,7 @@ export default {
     async getListParameterFn(){
       let res= await requestApi.parameterManage.getListParameter({
         method:'post',
-        data:{parameterId:getQueryVariable('id')}
+        data:{parameterId:this.$route.query.id}
       });
       if(res){
         this.tableData=res;
@@ -97,6 +96,18 @@ export default {
         this.getListParameterFn()
       }
     },
+    async moveListParameterFn(id,position){
+      let res=await requestApi.parameterManage.moveListParameter({
+        method:'post',
+        data:{
+          id,
+          position
+        }
+      });
+      if(res){
+        this.getListParameterFn()
+      }
+    },
     rowDropTable(){
         const ele = document.querySelector('.el-table__body-wrapper tbody');
         const _this = this;
@@ -105,16 +116,20 @@ export default {
                   let id=_this.tableData[oldIndex].id;
                   let targetId=_this.tableData[newIndex].id;
                   let position=oldIndex>newIndex?'before':'after';
+                  let oldRow=_this.tableData[newIndex];
+                  console.log(oldRow);
                   const currRow = _this.tableData.splice(oldIndex, 1)[0];
+                  console.log(currRow)
+                 
                   _this.tableData.splice(newIndex, 0, currRow);
-                  // _this.moveLayerFn(id,targetId,position)
+                  _this.moveListParameterFn(currRow.id,oldRow.position)
             },
         });
     },
     handleAdd(){
       this.$router.push({
         path:'addList',
-        query:{isEdit:false,parameterId:getQueryVariable('id')},
+        query:{isEdit:false,parameterId:this.$route.query.id},
       })
     },
     handleClickDelete(row){
@@ -137,7 +152,7 @@ export default {
     handleClickEdit(row){
       this.$router.push({
         path:'addList',
-        query:{isEdit:true,parameterId:getQueryVariable('id'),id:row.id,value:row.value},
+        query:{isEdit:true,parameterId:this.$route.query.id,id:row.id,value:row.value},
       })
     },
     handleCurrentChange(current){
