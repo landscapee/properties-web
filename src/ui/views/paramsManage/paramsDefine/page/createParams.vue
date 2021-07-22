@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-06-01 14:44:39
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-20 17:25:03
+ * @LastEditTime: 2021-07-22 10:24:32
 -->
 <template>
     <div class="createParams">
@@ -113,6 +113,38 @@ export default {
                 callback()
             }
         };
+        var validatorProperties=(rule, value, callback)=>{
+            if(this.form.type!=='TEXT'){
+                for (let i = 0; i < value.length; i++){
+                   if(!value[i].name){
+                        callback(new Error('请输入属性名'));
+                        return false
+                   }
+                   if(!value[i].code){
+                        callback(new Error('请输入编码'));
+                         return false
+                   }
+                   if(!value[i].type){
+                       callback(new Error('请选择类型'));
+                        return false
+                   }
+               }
+               callback()
+            }else{
+                callback()
+            } 
+        }
+        var validatorProperties2=(rule, value, callback)=>{
+            if(this.form.type=='TEXT'){
+                if(!value){
+                    callback(new Error('请选择'));
+                }else{
+                    callback()
+                }
+            }else{
+                callback()
+            }
+        }
         return { 
             paramsId:'',
             isEdit:false,
@@ -152,6 +184,12 @@ export default {
                 ],
                 parentId:[
                     {  required: true, trigger: 'change',validator:validatorParentId },
+                ],
+                properties:[
+                    {  required: true, trigger: 'change',validator:validatorProperties },
+                ],
+                properties2:[
+                    {  required: true, trigger: 'change',validator:validatorProperties2 },
                 ]
             }  
         }
