@@ -4,7 +4,7 @@
  * @Author: xdh.ss
  * @Date: 2020-04-08 12:12:33
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-20 11:13:47
+ * @LastEditTime: 2021-07-27 15:52:58
  */
 const merge = require('webpack-merge');
 const argv = require('yargs').argv;
@@ -28,39 +28,9 @@ module.exports = merge(common, {
         noInfo: false, // 隐藏bundle信息
         historyApiFallback: true,
         proxy: { // 代理
-            "/api":{
-                target: "http://173.101.3.113:18080",
-            },
-            "/project/api":{
-                target: "http://173.101.3.31:8089",
-                pathRewrite: {
-                    '^/project/api': ''
-                }
-            } ,
-            "/sso/api":{
-                target: "http://173.101.3.31:8082",
-                pathRewrite: {
-                    '^/sso/api': ''
-                }
-            },
-            "/map/api":{
-                target: "http://173.101.3.31:8080",
-                pathRewrite: {
-                    '^/map/api': '/geoserver/sccsky'
-                }
-            } ,
-            "/sys/api":{
-                target: "http://173.101.3.31:9089",
-                pathRewrite: {
-                    '^/sys/api': ''
-                }
-            },
-            "/file/api":{
-                target: "http://173.101.3.31:8845",
-                pathRewrite: {
-                    '^/file/api': ''
-                }
-            }         
+            "/api/param":{
+                target: "http://173.101.3.112:6066"
+            }      
         },
         //lazy: true, // 惰性模式
         after() {
