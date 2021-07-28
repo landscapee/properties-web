@@ -1,8 +1,8 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 16:40:26
- * @LastEditTime: 2021-06-25 14:12:03
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-07-20 17:15:01
+ * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\ListAddObject.vue
 -->
@@ -10,13 +10,13 @@
   <div class="treeList">
         <div class="classifyItems">
             <div class="classifyItems_box">
-              <Tree  :treeData='treeData' @handleSelect='handleSelect'></Tree>
+              <Tree  :treeData='treeData' @handleSelect='handleSelect' :config='treeConfig'></Tree>
             </div>
         </div>
         <div class="classify_info">
            <div class="title_box">
                 <div style="margin-left: auto;">
-                    <el-button class="add_btn" type="primary" >添加</el-button>
+                    <el-button class="add_btn" type="primary" v-if="treeData.length"  @click="handleAdd">添加</el-button>
                 </div>     
             </div>
             <Ftable :data="tableData" :tableConfig="tableConfig" :offsetTop="100" @handleSizeChange="handleSizeChange" @handleCurrentChange="handleCurrentChange">
@@ -38,42 +38,171 @@
 <script>
 import Tree from '@/components/tree';
 import Ftable from '@/components/table';
+import requestApi from '@/api/index.js';
+import Sortable from 'sortablejs';
 export default {
   name: 'TreeList',
   components:{Tree,Ftable},
+  props:['parentId','paramsProperties'],
   data() { 
     return {
         treeNodeId:'',
-        categoryOptions:[{name:'国内出港',id:"asdkj"},{name:'国际出港',id:"aasdkj"}],
-        treeData:[
-            {id:'shiping',name:'食品类',children:[{name:"0001 谷物、粮食粉、淀粉、乳制品；糕饼点心",id:'001'},{name:'0002 水果、坚果或植物其他部分的制品',id:'002'}]},
-            {id:'zhiwu',name:'植物类'}],
-        form:{
-            name:''
+        treeData:[],
+        treeConfig:{
+            operation:true,
+            draggable:false
         },
         params:{
-        size:10,
-        current:1
+            size:10,
+            current:1
         },
         tableData:{
             records:[],
         },
         tableConfig:[
             {type: 'index',label: '序号',align: 'center'},
-            { prop: 'name', label: '编码', align: 'center' },
-            { prop: 'code', label: '名称', align: 'center' },
             { slot: 'operation' },
-            ],
-        rules:{},
+        ],
     }
   },
+  mounted(){
+    let tableConfig=this.paramsProperties.map((item)=>{
+       return {
+         prop:item.code,
+         label:item.name,
+         formatter:(row)=>{
+          let value=JSON.parse(row.value);
+          let currentData = value.find((itemc)=>{
+            return itemc.code===item.code
+          });
+          return currentData.value
+         },
+         align:'center'
+       }
+    });
+    this.tableConfig.push(...tableConfig);
+    this.getTreeParameterFn();
+    this.$nextTick(()=>{
+        this.rowDropTable()
+    })
+  },
   methods:{
-    handleSelect(data){
-        console.log(data)
-        this.treeNodeId=data.id;
+    async getTreeParameterFn(){
+      let res =await requestApi.parameterManage.getTreeParameter({
+        method:'post',
+        data:{parameterId:this.parentId}
+      });
+      if(res){
+        if(res.length){
+          this.treeData=this.handTreeData(res);
+        }
+      }
     },
-    handleClickDelete(row){},
-    handleClickEdit(row){},
+    //
+    async getListParameterFn(){
+        let res = await requestApi.parameterManage.getListParameter({
+            method:'post',
+            data:{
+                parameterId:this.$route.query.id,
+                parentDataId:this.treeNodeId
+            }
+        });
+        if(res){
+            this.tableData=res;
+        }
+    },
+    async deleteListParameterFn(id){
+        let res= await requestApi.parameterManage.deleteListParameter({
+            method:'postquery',
+            params:{id}
+        });
+        if(res){
+            this.$message({
+                type:'success',
+                message:'删除成功'
+            })
+            this.getListParameterFn()
+        }
+    },
+     async moveListParameterFn(id,position){
+      let res= requestApi.parameterManage.moveListParameter({
+        method:'post',
+        data:{
+          id,
+          position
+        }
+      });
+      if(res){
+        //this.getListParameterFn()
+      }
+    },
+     rowDropTable(){
+        const ele = document.querySelector('.el-table__body-wrapper tbody');
+        const _this = this;
+        Sortable.create(ele, {
+            onEnd({ newIndex, oldIndex }) {
+                //   let id=_this.tableData[oldIndex].id;
+                //   let targetId=_this.tableData[newIndex].id;
+                //   let position=oldIndex>newIndex?'before':'after';
+                  let oldRow=_this.tableData[newIndex];
+                  const currRow = _this.tableData.splice(oldIndex, 1)[0];
+                  _this.tableData.splice(newIndex, 0, currRow);
+                  _this.moveListParameterFn(currRow.id,oldRow.position)
+            },
+        });
+    },
+    handleAdd(){
+        this.$router.push({
+            path:'addListAddList',
+            query:{isEdit:false,parameterId:this.$route.query.id,parentDataId:this.treeNodeId},
+        })
+    },
+    handTreeData(treeData){
+      let tree=[];
+      treeData.forEach(item => {
+          let value=JSON.parse(item.value);
+          let active=value.find(itemv => {
+              return itemv.isText===true;
+          });
+          let tmp={
+              name:active.value,
+              id:item.id,
+              parameterId:item.parameterId,
+              value:item.value,
+              children:[]
+          }
+          if(item.subTree.length){
+            tmp.children=this.handTreeData(item.subTree)
+          }
+           tree.push(tmp)
+       })
+       return tree
+    },
+    handleSelect(data){
+      
+        this.treeNodeId=data.id;
+        this.getListParameterFn()
+    },
+    handleClickDelete(row){
+        this.$confirm(`是否删除?`, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }).then(() => {
+            this.deleteListParameterFn(row.id)
+        }).catch((err) => {
+            this.$message({
+                type: 'info',
+                message: '已取消删除',
+            });
+        });
+    },
+    handleClickEdit(row){
+          this.$router.push({
+            path:'addListAddList',
+            query:{isEdit:true,parameterId:this.$route.query.id,parentDataId:this.treeNodeId,row:JSON.stringify(row)},
+        })
+    },
     handleCurrentChange(current){
       this.params.current=current
     },

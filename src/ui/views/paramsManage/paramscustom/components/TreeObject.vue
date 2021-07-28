@@ -1,58 +1,197 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 16:40:26
- * @LastEditTime: 2021-06-25 10:15:39
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-07-20 17:14:50
+ * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\ListAddObject.vue
 -->
 <template>
   <div class="treeObject">
         <div class="classifyItems">
+            <el-button type="primary" class="big_btn" icon="el-icon-circle-plus-outline" @click="handleAdd">添加</el-button>
             <div class="classifyItems_box">
-              <Tree  :treeData='treeData' @handleSelect='handleSelect'></Tree>
+              <Tree  :treeData='treeData' @handleSelect='handleSelect' :config='treeConfig' @getCurrentNode='nodeOperation' @moveCategories='moveTreeNode'></Tree>
             </div>
         </div>
         <div class="classify_info">
-            <el-form :model="form" :rules="rules" ref="ruleForm" label-width="160px" class="collect_form">
-               <el-form-item label="名称" prop="name">
-                <el-input v-model="form.name"  placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="编号" prop="name">
-                    <el-input v-model="form.name"  placeholder="请输入"></el-input>
-                </el-form-item> 
-              <el-form-item label="">
-                  <el-button type="primary" @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
-              </el-form-item>
-          </el-form>   
+            <el-form :model="form"  ref="ruleForm" label-width="160px" class="collect_form">
+                  <el-form-item 
+                  :label="item.name" 
+                  v-for="(item,index) in form.properties" 
+                  :key="index"
+                  :prop="'properties.' + index + '.value'"
+                  :rules="[
+                      { required: true, message: '请输入', trigger: 'blur' },
+                      ]"
+                  >
+                      <el-input v-model="item.value"  placeholder="请输入"></el-input>
+                  </el-form-item>
+                  <el-form-item label="" v-if="treeData.length">
+                      <el-button type="primary" @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
+                  </el-form-item>
+            </el-form>
         </div>
   </div>
 </template>
 
 <script>
 import Tree from '@/components/tree';
+import requestApi from '@/api/index.js';
 export default {
   name: 'TreeObject',
   components:{Tree},
+  props:['paramsProperties'],
   data() { 
     return {
         treeNodeId:'',
-        categoryOptions:[{name:'国内出港',id:"asdkj"},{name:'国际出港',id:"aasdkj"}],
-        treeData:[
-            {id:'shiping',name:'食品类',children:[{name:"0001 谷物、粮食粉、淀粉、乳制品；糕饼点心",id:'001'},{name:'0002 水果、坚果或植物其他部分的制品',id:'002'}]},
-            {id:'zhiwu',name:'植物类'}],
+        treeConfig:{
+            operation:true,
+            draggable:true
+        },
+        treeData:[],
         form:{
-            name:''
+            properties:[],
         },
         rules:{},
     }
   },
+  mounted(){
+    this.getTreeParameterFn();
+  },
   methods:{
+    async updateTreeParameterFn(){
+      let res = await requestApi.parameterManage.updateTreeParameter({
+        method:'post',
+        data:{
+          parameterId:this.$route.query.id,
+          value:JSON.stringify(this.form.properties),
+          id:this.treeNodeId
+        }
+      });
+      if(res){
+        this.$message({
+          type:'success',
+          message:'保存成功'
+        });
+        this.getTreeParameterFn()
+      }
+    },
+    async getTreeParameterFn(){
+      let res =await requestApi.parameterManage.getTreeParameter({
+        method:'post',
+        data:{parameterId:this.$route.query.id}
+      });
+      if(res){
+        
+        if(res.length){
+          this.treeData=this.handTreeData(res);
+        }else{
+          this.treeData=[];
+          this.form.properties=[]
+        }
+      }
+    },
+    async deleteTreeParameterFn(id){
+      let res = await requestApi.parameterManage.deleteTreeParameter({
+        method:"postquery",
+        params:{id}
+      })
+      if(res){
+        this.$message({
+          type:'success',
+          message:'删除成功'
+        })
+        this.getTreeParameterFn()
+      }
+    },
+    async moveTreeParameterFn(data){
+      let res=await requestApi.parameterManage.moveTreeParameter({
+        method:'post',
+        data,
+      })
+      if(res){
+        this.getTreeParameterFn()
+      }
+    },
+    moveTreeNode(draggingNode,dropNode,dropType){
+        let data={
+            id:draggingNode.data.id,
+            targetId:dropNode.data.id,
+            relative:dropType,
+        };
+      this.moveTreeParameterFn(data)
+     
+    },
+    handTreeData(treeData){
+      let tree=[];
+      treeData.forEach(item => {
+          let value=JSON.parse(item.value);
+          let active=value.find(itemv => {
+              return itemv.isText===true;
+          });
+          let tmp={
+              name:active.value,
+              id:item.id,
+              parameterId:item.parameterId,
+              pid:item.pid,
+              position:item.position,
+              value:item.value,
+              children:[]
+          }
+          if(item.subTree.length){
+            tmp.children=this.handTreeData(item.subTree)
+          }
+           tree.push(tmp)
+       })
+       return tree
+    },
+    handleAdd(){
+      this.$router.push({
+        path:'addTree',
+        query:{properties:JSON.stringify(this.paramsProperties),parameterId:this.$route.query.id,pid:''}
+      })
+    },
+    //增加子节点
+    nodeOperation(data,type){
+     
+      if(type==='delete'){
+          this.$confirm(`是否删除节点?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        })
+          .then(() => {
+            this.deleteTreeParameterFn(data.id)
+          })
+          .catch((err) => {
+            console.log(err)
+            this.$message({
+              type: 'info',
+              message: '已取消删除',
+            });
+          });
+      }else{
+        this.$router.push({
+          path:'addTree',
+          query:{properties:JSON.stringify(this.paramsProperties),parameterId:this.$route.query.id,pid:this.treeNodeId}
+        })
+      }
+    },
     handleSelect(data){
-        console.log(data);
+        this.form.properties=JSON.parse(data.value)
         this.treeNodeId=data.id;
     },
-    submitForm(){}
+     submitForm(){
+        this.$refs['ruleForm'].validate((valid) => {
+        if (valid) {
+            this.updateTreeParameterFn();
+        } else {
+            console.error('error submit!!');
+            return false;
+        }
+        });
+    },
   }
  }
 </script>
@@ -63,5 +202,11 @@ export default {
      width: 100%;
      height: 100%;
  }
-
+ .classifyItems{
+   overflow: hidden;
+ }
+  .classifyItems_box{
+    height: calc(100% - 56px);
+    overflow: auto;
+  }
 </style>

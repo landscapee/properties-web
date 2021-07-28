@@ -8,7 +8,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack-dev-server --config webpack.dev.js --Program fpms.dev",
     "build": "webpack --config webpack.prod.js --Program fpms.build",
-    "test.deploy": "scp -r build/* root@173.101.3.31:/home/apps/gis/gis-ui/",
+    "build:test": "webpack --config webpack.prod.js --Program fpms.build",
+    "test.deploy": "scp -r build/* root@173.101.3.112:/var/www/parameter",
+    "test.deploy.build": "yarn run build:test && yarn test.deploy",
     "dev.deploy": "yarn run build && yarn test.deploy"
   },
   "repository": {
@@ -60,7 +62,7 @@
     "ol": "^6.4.3",
     "postal": "^2.0.5",
     "socket.io": "^2.3.0",
-    "sortablejs": "^1.13.0",
+    "sortablejs": "^1.14.0",
     "uuid": "^8.0.0",
     "validator": "^13.0.0",
     "vue": "^2.6.11",

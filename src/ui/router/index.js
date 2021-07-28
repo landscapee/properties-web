@@ -3,14 +3,22 @@
  * @Author: yang fu ren
  * @version: 
  * @Date: 2021-03-29 10:23:11
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-06-24 10:24:05
+ * @LastEditors: yang fu ren
+ * @LastEditTime: 2021-07-20 10:07:57
  */
 import Vue from 'vue'
 import Router from 'vue-router'
 Vue.use(Router)
 //菜单列表
 export const menuPermissions=[
+  {
+    path:'/',
+    component:() => import('@/views/paramsManage/paramsDefine/index'),
+    name:'参数定义管理',
+    code:'paramsDefine',
+    menuPermissions:'paramsDefine',
+    meta:{title:'参数定义管理',icon:'csgl'},
+  },
   {
     path:'/paramsDefine',
     component:() => import('@/views/paramsManage/paramsDefine/index'),
@@ -28,16 +36,40 @@ export const menuPermissions=[
     meta:{title:'创建参数',icon:'csgl',gobackbtn:true},
   },
   {
-    path:'/paramscustom',
+    path:'/parameterEditor',
     component:() => import('@/views/paramsManage/paramscustom/index'),
     name:'自定义菜单',
-    code:'paramscustom',
-    menuPermissions:'paramscustom',
+    code:'parameterEditor',
+    menuPermissions:'parameterEditor',
     meta:{title:'自定义菜单',icon:'csgl'},
+  },
+  {
+    path:'/addList',
+    component:() => import('@/views/paramsManage/paramscustom/pages/addList'),
+    name:'添加数据',
+    code:'addList',
+    menuPermissions:'addList',
+    meta:{title:'自定义菜单',icon:'csgl',gobackbtn:true},
+  },
+  {
+    path:'/addListAddList',
+    component:() => import('@/views/paramsManage/paramscustom/pages/addListAddList'),
+    name:'列表子列表添加数据',
+    code:'addListAddList',
+    menuPermissions:'addListAddList',
+    meta:{title:'自定义菜单',icon:'csgl',gobackbtn:true},
+  },
+  {
+    path:'/addTree',
+    component:() => import('@/views/paramsManage/paramscustom/pages/addTree'),
+    name:'添加子节点',
+    code:'addTree',
+    menuPermissions:'addTree',
+    meta:{title:'自定义菜单',icon:'csgl',gobackbtn:true},
   },
 ]
 export default new Router({
-  mode:'history',
+  //mode:'history',
 	fallback: false,
 	routes: menuPermissions
 })

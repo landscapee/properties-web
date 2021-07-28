@@ -1,27 +1,27 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-23 14:30:28
+<<<<<<< HEAD
  * @LastEditTime: 2021-07-11 11:07:21
  * @LastEditors: Please set LastEditors
+=======
+ * @LastEditTime: 2021-07-20 17:15:10
+ * @LastEditors: yang fu ren
+>>>>>>> 97ee7a7bcbddf9a8bd11430ac67f7ef670aec2e8
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\index.vue
 -->
 <template>
    <div class="paramscustom">
       <div class="page_content"  v-if="paramsType==='TEXT'||paramsType==='OBJECT'">
-          <el-form :model="form" :rules="rules" ref="ruleForm" label-width="160px" class="collect_form">
-              <SingleValue v-if="paramsType==='TEXT'"></SingleValue>
-              <Object v-if="paramsType==='OBJECT'"></Object>
-              <el-form-item label="">
-                  <el-button type="primary" @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
-              </el-form-item>
-          </el-form>   
+            <SingleValue v-if="paramsType==='TEXT'" :paramsProperties='form.properties' :key="paramsId"></SingleValue>
+            <Object v-if="paramsType==='OBJECT'" :paramsProperties='form.properties' :key="paramsId"></Object>
       </div>
-      <List v-if="paramsType==='LIST'"></List>
-      <ListAddObject v-if="paramsType==='SUB_OBJECT'"></ListAddObject>
-      <ListAddList  v-if="paramsType==='SUB_LIST'"></ListAddList>
-      <TreeObject  v-if="paramsType==='TREE_OBJECT'"></TreeObject>
-      <TreeList  v-if="paramsType==='TREE_LIST'"></TreeList>
+      <List v-if="paramsType==='LIST'" :paramsProperties='form.properties' :key="paramsId"></List>
+      <ListAddObject v-if="paramsType==='SUB_OBJECT'" :parentId='parentId' :paramsProperties='form.properties' :key="paramsId"></ListAddObject>
+      <ListAddList  v-if="paramsType==='SUB_LIST'"  :parentId='parentId' :paramsProperties='form.properties' :key="paramsId"></ListAddList>
+      <TreeObject  v-if="paramsType==='TREE'" :parentId='parentId' :paramsProperties='form.properties' :key="paramsId"></TreeObject>
+      <TreeList  v-if="paramsType==='TREE_LIST'" :parentId='parentId' :paramsProperties='form.properties' :key="paramsId"></TreeList>
     </div>
 </template>
 <script>
@@ -32,33 +32,47 @@ import ListAddObject from './components/ListAddObject.vue'
 import List from './components/List.vue'
 import Object from './components/Object.vue'
 import SingleValue from './components/SingleValue.vue'
-import getQueryVariable from '@/utils/getQueryVariable';
+import requestApi from '@/api/index.js';
 export default {
   name: 'paramscustom',
   components:{SingleValue,Object,List,ListAddObject,ListAddList,TreeObject,TreeList},
   data() { 
     return {
-        id:getQueryVariable('id').split('paramsType')[0],
-        form:{},
+        form:{
+            properties:[]
+        },
         rules:{},
+        paramsType:'',
+        parentId:'',
+        paramsId:'',
     }
   },
-  computed:{
-    paramsType:function(){
-      return getQueryVariable('id').split('paramsType')[1]
-    },
+  mounted(){
+       this.getParameterInfoFn()
+  },
+  watch:{
+      $route: {
+        handler() {
+             this.getParameterInfoFn()
+        },
+        deep: true,
+    }
   },
   methods:{
-     submitForm(){
-            this.$refs['ruleForm'].validate((valid) => {
-            if (valid) {
-               
-            } else {
-                console.error('error submit!!');
-                return false;
-            }
-            });
-        },
+     //
+     async getParameterInfoFn(){
+        let res= await requestApi.parameterManage.getParameterInfo({
+            method:'postquery',
+            repeat:true,
+            params:{id:this.$route.query.id}
+         });
+         if(res){
+             this.paramsType=res.type;
+             this.form.properties=JSON.parse(res.properties);
+             this.parentId=res.parentId||'';
+             this.paramsId=this.$route.query.id
+         }
+     }, 
   }
  }
 </script>
@@ -67,6 +81,7 @@ export default {
 .paramscustom{
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 .page_header{
     width: 100%;

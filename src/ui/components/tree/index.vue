@@ -3,8 +3,8 @@
  * @Author: yang fu ren
  * @version: 
  * @Date: 2021-03-31 14:08:41
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-06-25 10:08:06
+ * @LastEditors: yang fu ren
+ * @LastEditTime: 2021-07-20 17:07:25
 -->
 <template>
 	<div id="tree">
@@ -20,28 +20,30 @@
             @node-drop="handleDrop"
             :expand-on-click-node='false'
             :props="defaultProps"
-            draggable
+            :draggable='config.draggable'
             :allow-drop="allowDrop"
             :allow-drag="allowDrag"
             @current-change="handleSelectChange"
             >
             <span class="custom-tree-node" slot-scope="{ node, data }">
                 <span class="label ellipsisLineOne" :title="node.label">{{ `${node.label}` }}</span>
-                <!-- <el-popover
+                <el-popover
                         placement="bottom"
                         width="70"
                         popper-class='layerManage_popover'
+                        trigger="hover"
+                        v-if="config.operation"
                         >
                         <div class="popover_content" style="text-align: center; margin: 0">
                             <div class="popover_opera edit" @click='handleClickAddClass(data)'><icon-svg icon-class="edit_icon" style="color:#00dcff;margin-right:10px"></icon-svg>新增</div>
-                            <div class="popover_opera edit"  @click='handleClickEditClass(data)'><icon-svg icon-class="edit_icon" style="color:#00dcff;margin-right:10px"></icon-svg>编辑</div>
+                            <!-- <div class="popover_opera edit"  @click='handleClickEditClass(data)'><icon-svg icon-class="edit_icon" style="color:#00dcff;margin-right:10px"></icon-svg>编辑</div> -->
                             <div class="popover_opera delate" @click='handleClickDelateClass(data)'><icon-svg icon-class="delate_icon" style="color:#00dcff;margin-right:10px"></icon-svg>删除</div>
                         </div>
                         <span slot="reference" class="operation_icon">
                             <p class="point" style="margin-bottom: 4px;"></p>
                             <p class="point" ></p>
                         </span>
-                    </el-popover> -->
+                    </el-popover>
 			        </span>
       </el-tree>
 		<!--弹窗 -->
@@ -61,7 +63,7 @@ export default {
         }
     }
  },
- props:['treeData'],
+ props:['treeData','config'],
  watch:{
    treeData(val) {
 			if (val && val.length) {
@@ -89,14 +91,12 @@ export default {
      this.$emit('getCurrentNode',data,'edit')
    },
    handleClickDelateClass(data){
-     this.$emit('getCurrentNode',data,'delate')
+     this.$emit('getCurrentNode',data,'delete')
    },
    handleSelectChange(data, node){
      this.$emit('handleSelect', data);
    },
     handleDrop(draggingNode, dropNode, dropType, ev) {
-        console.log(dropType);
-         console.log(ev);
         this.$emit('moveCategories',draggingNode,dropNode,dropType)
         //console.log('tree drop: ', dropNode.label, dropType);
       },
@@ -124,8 +124,8 @@ export default {
 <style lang="scss" scoped>
 .custom-tree-node{
     width: calc(100% - 28px);
-    // display: flex;
-    // justify-content: space-around;
+    display: flex;
+    justify-content: space-around;
     .label{
         vertical-align: middle;
         display: inline-block;
