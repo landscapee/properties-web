@@ -3,8 +3,8 @@
  * @Author: yang fu ren
  * @version: 
  * @Date: 2021-04-08 10:08:25
- * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-19 16:00:29
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-07-28 14:10:39
 -->
 <template>
   <div style="height:100%;width:100%">
@@ -55,13 +55,18 @@ export default {
     }
   },
   mounted(){
-    if(!localStorage.getItem('token')){
-      localStorage.setItem('token',this.$route.query.token);
-    }
-    if(!localStorage.getItem('projectId')){
-       localStorage.setItem('projectId', this.$route.query.projectId);
-    }
+    console.log('参数管理')
+    console.log(this.$route.query.projectId)
+    localStorage.setItem('token',this.$route.query.token);
+    localStorage.setItem('projectId', this.$route.query.projectId);
     this.getListFn()
+  },
+  watch:{
+    $route:function(){
+      console.log('路由变化');
+      localStorage.setItem('projectId',this.$route.query.projectId);
+      this.getListFn()
+    },
   },
   methods:{
     async deleteFn(id){
@@ -84,7 +89,7 @@ export default {
     async getListFn(){
       let res = await requestApi.parameterManage.getList({
         method:'postquery',
-        params:{systemId:localStorage.getItem('projectId')}
+        params:{systemId: this.$route.query.projectId}
       });
       if(res){
         this.tableData=res;

@@ -3,8 +3,8 @@
  * @Author: yang fu ren
  * @version: 
  * @Date: 2021-06-01 14:44:39
- * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-22 10:24:32
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-07-28 14:18:44
 -->
 <template>
     <div class="createParams">
@@ -363,6 +363,14 @@ export default {
         submitForm(){
             this.$refs['ruleForm'].validate((valid) => {
             if (valid) {
+                console.log('系统id', this.form.systemId);
+                if(!this.form.systemId){
+                    this.$message({
+                        type:"warning",
+                        message:'请选择对应的系统'
+                    });
+                    return false;
+                }
                 if(this.isEdit){
                     this.updateFn()
                 }else{
