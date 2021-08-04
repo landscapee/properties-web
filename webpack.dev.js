@@ -3,8 +3,8 @@
  * @version: 
  * @Author: xdh.ss
  * @Date: 2020-04-08 12:12:33
- * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-27 15:52:58
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-08-04 14:37:09
  */
 const merge = require('webpack-merge');
 const argv = require('yargs').argv;
@@ -14,7 +14,7 @@ const webpack = require('webpack');
 let port = 8000;
 
 if (argv.Program === 'fpms.dev') {
-    port = 8087;
+    port = 6066;
 }
 ;
 
