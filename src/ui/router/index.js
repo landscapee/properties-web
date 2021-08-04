@@ -3,8 +3,8 @@
  * @Author: yang fu ren
  * @version: 
  * @Date: 2021-03-29 10:23:11
- * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-20 10:07:57
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-08-03 14:44:53
  */
 import Vue from 'vue'
 import Router from 'vue-router'
@@ -20,7 +20,7 @@ export const menuPermissions=[
     meta:{title:'参数定义管理',icon:'csgl'},
   },
   {
-    path:'/paramsDefine',
+    path:'/parameter',
     component:() => import('@/views/paramsManage/paramsDefine/index'),
     name:'参数定义管理',
     code:'paramsDefine',

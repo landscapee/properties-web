@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-04-08 10:08:25
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-07-28 14:10:39
+ * @LastEditTime: 2021-08-02 21:02:55
 -->
 <template>
   <div style="height:100%;width:100%">
@@ -43,11 +43,27 @@ export default {
       tableData:{
           records:[],
       },
+       paramsList:[
+                {name:'单值',code:'TEXT'},
+                {name:'对象',code:'OBJECT'},
+                {name:'列表',code:'LIST'},
+                {name:'树型',code:'TREE'},
+                {name:'树型子列表',code:'TREE_LIST'},
+                {name:'列表子对象',code:'SUB_OBJECT'},
+                {name:'列表子列表',code:'SUB_LIST'}
+                ],
       tableConfig:[
         {type: 'index',label: '序号',align: 'center'},
         { prop: 'name', label: '参数名称', align: 'center' },
         { prop: 'code', label: '参数编码', align: 'center' },
-        { prop: 'type', label: '参数类型', align: 'center' },
+        { prop: 'type', label: '参数类型', align: 'center',formatter:(row)=>{
+          if(row.type){
+            let result=this.paramsList.find(item=>{return row.type===item.code}).name;
+            return result;
+          }else{
+            return '--'
+          }
+        } },
         { prop: 'comment', label: '描述', align: 'center' },
         { prop: 'time', label: '创建时间', align: 'center' },
         { slot: 'operation' },
@@ -62,11 +78,14 @@ export default {
     this.getListFn()
   },
   watch:{
-    $route:function(){
-      console.log('路由变化');
-      localStorage.setItem('projectId',this.$route.query.projectId);
-      this.getListFn()
-    },
+    $route:{
+      handler:function(){
+        console.log('路由变化');
+        localStorage.setItem('projectId',this.$route.query.projectId);
+        this.getListFn()
+      },
+        deep:true
+      }
   },
   methods:{
     async deleteFn(id){
@@ -89,7 +108,8 @@ export default {
     async getListFn(){
       let res = await requestApi.parameterManage.getList({
         method:'postquery',
-        params:{systemId: this.$route.query.projectId}
+        params:{systemId: this.$route.query.projectId},
+        repeat:true,
       });
       if(res){
         this.tableData=res;
