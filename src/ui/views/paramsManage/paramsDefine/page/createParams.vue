@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-06-01 14:44:39
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-07 17:40:44
+ * @LastEditTime: 2021-09-07 17:52:12
 -->
 <template>
     <div class="createParams">
@@ -59,8 +59,7 @@
                                 <el-option label="关联对象" value="objectList"></el-option>
                             </el-select>
                              <el-select style="width:50%" v-if="item.type==='objectList'" v-model="item.relateObjectId" placeholder="请选择">
-                                <el-option :label="relateObject.id" :value="relateObject.value" v-for="relateObject in relateObjectLists" :key="relateObject.id"></el-option>
-                                
+                                <el-option :label="relateObject.name" :value="relateObject.id" v-for="relateObject in relateObjectLists" :key="relateObject.id"></el-option>
                             </el-select>
                         </el-col>
                         <el-col :span="3" style="margin-right: 5px;text-align:center">
@@ -245,7 +244,7 @@ export default {
             });
             if(res){
                 console.log(res);
-
+                this.relateObjectLists=res;
             }
         },
         async parentOptionsFn(){
