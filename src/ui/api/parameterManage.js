@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-04-01 10:33:58
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-27 15:32:58
+ * @LastEditTime: 2021-09-07 17:07:18
  * 参数管理
  */
 export const parameterManage={
@@ -33,5 +33,5 @@ export const parameterManage={
     deleteTreeParameter:'/api/param/api/parameter-tree/delete', //删除树数据post(url)
     moveTreeParameter:'/api/param/api/parameter-tree/move', //树节点排序数据post(url)
 
-
+    getRelateObject:'/api/param/api/parameterManage/relateObject', //获取管理对象POST(url)
 }

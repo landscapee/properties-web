@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-06-01 14:44:39
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-22 10:24:32
+ * @LastEditTime: 2021-09-07 17:35:07
 -->
 <template>
     <div class="createParams">
@@ -39,7 +39,7 @@
                     <el-row>
                         <el-col :span="3" style="margin-right: 5px;font-size:16px">属性名称</el-col>
                         <el-col :span="3" style="margin-right: 5px;font-size:16px">属性编码</el-col>
-                        <el-col :span="3" style="margin-right: 5px;font-size:16px">属性类型</el-col>
+                        <el-col :span="6" style="margin-right: 5px;font-size:16px">属性类型</el-col>
                         <el-col :span="3" style="margin-right: 5px;font-size:16px;text-align:center">展示字段</el-col>
                         <el-col :span="3" style="margin-right: 5px;font-size:16px;text-align:center">值字段</el-col>
                     </el-row>
@@ -50,12 +50,17 @@
                         <el-col :span="3" style="margin-right: 5px">
                             <el-input v-model="item.code"  placeholder="请输入"></el-input>
                         </el-col>
-                        <el-col :span="3" style="margin-right: 5px">
-                            <el-select v-model="item.type" placeholder="请选择">
+                        <el-col :span="6" style="margin-right: 5px;display:flex" >
+                            <el-select v-model="item.type" placeholder="请选择" style="width:50%">
                                 <el-option label="文本" value="text"></el-option>
                                 <el-option label="数组" value="list"></el-option>
                                 <el-option label="IP" value="ip"></el-option>
                                 <el-option label="真假" value="boolean"></el-option>
+                                <el-option label="关联对象" value="objectList"></el-option>
+                            </el-select>
+                             <el-select style="width:50%" v-if="item.type==='objectList'" v-model="item.relateObjectId" placeholder="请选择">
+                                <el-option :label="relateObject.id" :value="relateObject.value" v-for="relateObject in relateObjectLists" :key="relateObject.id"></el-option>
+                                
                             </el-select>
                         </el-col>
                         <el-col :span="3" style="margin-right: 5px;text-align:center">
@@ -151,6 +156,7 @@ export default {
             parentList:[],
             parentOptions:[],
             checked:'',
+            relateObjectLists:[], //关联对象list
             paramsList:[
                 {name:'单值',code:'TEXT'},
                 {name:'对象',code:'OBJECT'},
@@ -165,11 +171,12 @@ export default {
                 name:'',
                 type:'OBJECT',
                 properties:[
-                    {name:'',code:'',type:'',isText:true,isValue:true}
+                    {name:'',code:'',type:'',isText:true,isValue:true,relateObjectId:''}
                 ],
                 properties2:'',
                 comment:'',
                 parentId:'',
+               
             },
             fileList:[],
              rules:{
@@ -228,8 +235,19 @@ export default {
            this.isEdit=false;
        }
        this.parentOptionsFn();
+       this.getRelateObjectFn();
     },
     methods:{
+        async getRelateObjectFn(){
+            let res = await requestApi.parameterManage.getRelateObject({
+                method:"postquery",
+                params:{systemId:this.form.systemId}
+            });
+            if(res){
+                console.log(res);
+
+            }
+        },
         async parentOptionsFn(){
             let res=await requestApi.parameterManage.parentOptions({
                 method:'postquery',
@@ -247,11 +265,15 @@ export default {
         },
         async addFn(){
             let data={
-                ...this.form
+                ...this.form,
+                 classifyId:this.$route.query.classifyId
             };
             if(this.form.type==='TEXT'){
                 data.properties=[{name:'',code:'',type:data.properties2}]
             };
+            if(!data.parentId){
+                delete data.parentId
+            }
             data.properties=JSON.stringify(data.properties);
             delete data.properties2;
          
@@ -273,11 +295,15 @@ export default {
         async updateFn(){
             let data={
                 id:this.paramsId,
-                ...this.form
+                ...this.form,
+                classifyId:this.$route.query.classifyId
             }
             if(this.form.type==='TEXT'){
                 data.properties=[{name:'',code:'',type:data.properties2}]
             };
+            if(!data.parentId){
+                delete data.parentId
+            }
             data.properties=JSON.stringify(data.properties);
             delete data.properties2;
             let res = await requestApi.parameterManage.update({
@@ -414,7 +440,7 @@ export default {
 }
 .page_content{
     margin-top:26px;
-    width: 1000px;
+    width: 1200px;
 }
 .service{
     .el-checkbox{

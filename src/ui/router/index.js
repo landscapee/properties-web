@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-03-29 10:23:11
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-20 10:07:57
+ * @LastEditTime: 2021-09-03 17:14:24
  */
 import Vue from 'vue'
 import Router from 'vue-router'
@@ -34,6 +34,14 @@ export const menuPermissions=[
     code:'createParams',
     menuPermissions:'createParams',
     meta:{title:'创建参数',icon:'csgl',gobackbtn:true},
+  },
+  {
+    path:'/createClassify',
+    component:() => import('@/views/paramsManage/paramsDefine/page/createClassify'),
+    name:'创建分类',
+    code:'createClassify',
+    menuPermissions:'createClassify',
+    meta:{title:'创建分类',icon:'csgl',gobackbtn:true},
   },
   {
     path:'/parameterEditor',

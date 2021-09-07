@@ -4,7 +4,7 @@
  * @Author: xdh.ss
  * @Date: 2020-04-08 12:12:33
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-27 15:52:58
+ * @LastEditTime: 2021-09-07 15:16:15
  */
 const merge = require('webpack-merge');
 const argv = require('yargs').argv;
@@ -23,13 +23,18 @@ module.exports = merge(common, {
     devServer: {
         port: port,
         open: false,
-        host:'0.0.0.0',
+        host:'localhost',
         progress: true, // 打包过程中的进度条
         noInfo: false, // 隐藏bundle信息
         historyApiFallback: true,
         proxy: { // 代理
             "/api/param":{
-                target: "http://173.101.3.112:6066"
+                //target: "http://173.101.3.112:6066"
+                target: "http://173.100.1.154:18080", //邛崃测试,
+                pathRewrite: {
+                    '^/api/param': ''
+                }
+                
             }      
         },
         //lazy: true, // 惰性模式
