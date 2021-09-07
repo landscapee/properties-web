@@ -3,13 +3,8 @@
  * @version: 
  * @Author: xdh.ss
  * @Date: 2020-04-08 12:12:33
-<<<<<<< HEAD
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-07 15:16:15
-=======
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-04 14:37:09
->>>>>>> 821bfc2127ddc6a59ac2ab68476e48db1dad344e
+ * @LastEditTime: 2021-09-07 17:40:06
  */
 const merge = require('webpack-merge');
 const argv = require('yargs').argv;

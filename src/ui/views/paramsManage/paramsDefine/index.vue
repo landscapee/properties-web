@@ -3,13 +3,8 @@
  * @Author: yang fu ren
  * @version: 
  * @Date: 2021-04-08 10:08:25
-<<<<<<< HEAD
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-07 16:57:52
-=======
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-02 21:02:55
->>>>>>> 821bfc2127ddc6a59ac2ab68476e48db1dad344e
+ * @LastEditTime: 2021-09-07 17:40:07
 -->
 <template>
   <div style="height:100%;width:100%;display:flex">
@@ -91,7 +86,6 @@ export default {
     }
   },
   mounted(){
-<<<<<<< HEAD
     if(!localStorage.getItem('token')){
       localStorage.setItem('token',this.$route.query.token);
     }
@@ -100,13 +94,6 @@ export default {
     }
     //this.getListFn();
     this.getParammsClassifyFn();
-=======
-    console.log('参数管理')
-    console.log(this.$route.query.projectId)
-    localStorage.setItem('token',this.$route.query.token);
-    localStorage.setItem('projectId', this.$route.query.projectId);
-    this.getListFn()
->>>>>>> 821bfc2127ddc6a59ac2ab68476e48db1dad344e
   },
   watch:{
     $route:{
@@ -149,12 +136,7 @@ export default {
     async getListFn(){
       let res = await requestApi.parameterManage.getList({
         method:'postquery',
-<<<<<<< HEAD
         params:{systemId:localStorage.getItem('projectId'),classifyId:this.categoryId}
-=======
-        params:{systemId: this.$route.query.projectId},
-        repeat:true,
->>>>>>> 821bfc2127ddc6a59ac2ab68476e48db1dad344e
       });
       if(res){
         this.tableData=res;

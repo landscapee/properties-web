@@ -3,13 +3,8 @@
  * @Author: yang fu ren
  * @version: 
  * @Date: 2021-03-29 10:23:11
-<<<<<<< HEAD
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-03 17:14:24
-=======
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-03 14:44:53
->>>>>>> 821bfc2127ddc6a59ac2ab68476e48db1dad344e
+ * @LastEditTime: 2021-09-07 17:40:10
  */
 import Vue from 'vue'
 import Router from 'vue-router'
