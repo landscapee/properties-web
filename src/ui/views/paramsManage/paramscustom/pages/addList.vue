@@ -3,8 +3,8 @@
  * @Author: yang fu ren
  * @version: 
  * @Date: 2021-07-07 11:32:05
- * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-14 09:42:29
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-08-03 16:26:37
 -->
 <template>
    <el-form :model="form"  ref="ruleForm" label-width="160px" class="collect_form">
@@ -43,24 +43,40 @@ export default {
         let query=this.$route.query;
         this.parameterId=query.parameterId;
         this.isEdit=query.isEdit;
+        console.log('tag', this.isEdit)
         if(this.isEdit){
             this.id=query.id;
-            this.form.properties=JSON.parse(query.value)
+            //this.form.properties=JSON.parse(query.value);
+            this.getParameterInfoFn(JSON.parse(query.value));
         }else{
             this.getParameterInfoFn();
         }
         
     },
     methods:{
-        async getParameterInfoFn(){
+        async getParameterInfoFn(data){
             let res= await requestApi.parameterManage.getParameterInfo({
                 method:'postquery',
                 params:{id:this.parameterId}
             });
             if(res){
-            
                 this.paramsType=res.type;
-                this.form.properties=JSON.parse(res.properties)
+                let objRes= JSON.parse(res.properties);
+                if(data){
+                    objRes.forEach((item,i) => {
+                        data.forEach((citem,j)=>{
+                            if(item.code===citem.code){
+                                objRes.splice(i,1,citem)
+                            }
+                        })
+                    });
+                    this.form.properties=objRes;
+                }else{
+                    this.form.properties=objRes;
+                }
+                
+                console.log(objRes);
+                console.log(data)
             }
         }, 
         async addListParameterFn(){

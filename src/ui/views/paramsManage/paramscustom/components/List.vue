@@ -3,8 +3,8 @@
  * @Author: yang fu ren
  * @version: 
  * @Date: 2021-04-08 10:08:25
- * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-20 16:55:36
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-08-03 08:24:34
 -->
 <template>
   <div style="height:100%;width:100%">
@@ -62,7 +62,7 @@ export default {
           let currentData = value.find((itemc)=>{
             return itemc.code===item.code
           });
-          return currentData.value
+          return currentData?currentData.value:''
          },
          align:'center'
        }

@@ -3,8 +3,13 @@
  * @Author: yang fu ren
  * @version: 
  * @Date: 2021-04-08 10:08:25
+<<<<<<< HEAD
  * @LastEditors: yang fu ren
  * @LastEditTime: 2021-09-07 16:57:52
+=======
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-08-02 21:02:55
+>>>>>>> 821bfc2127ddc6a59ac2ab68476e48db1dad344e
 -->
 <template>
   <div style="height:100%;width:100%;display:flex">
@@ -57,11 +62,27 @@ export default {
       tableData:{
           records:[],
       },
+       paramsList:[
+                {name:'单值',code:'TEXT'},
+                {name:'对象',code:'OBJECT'},
+                {name:'列表',code:'LIST'},
+                {name:'树型',code:'TREE'},
+                {name:'树型子列表',code:'TREE_LIST'},
+                {name:'列表子对象',code:'SUB_OBJECT'},
+                {name:'列表子列表',code:'SUB_LIST'}
+                ],
       tableConfig:[
         {type: 'index',label: '序号',align: 'center'},
         { prop: 'name', label: '参数名称', align: 'center' },
         { prop: 'code', label: '参数编码', align: 'center' },
-        { prop: 'type', label: '参数类型', align: 'center' },
+        { prop: 'type', label: '参数类型', align: 'center',formatter:(row)=>{
+          if(row.type){
+            let result=this.paramsList.find(item=>{return row.type===item.code}).name;
+            return result;
+          }else{
+            return '--'
+          }
+        } },
         { prop: 'comment', label: '描述', align: 'center' },
         { prop: 'time', label: '创建时间', align: 'center' },
         { slot: 'operation' },
@@ -70,6 +91,7 @@ export default {
     }
   },
   mounted(){
+<<<<<<< HEAD
     if(!localStorage.getItem('token')){
       localStorage.setItem('token',this.$route.query.token);
     }
@@ -78,6 +100,23 @@ export default {
     }
     //this.getListFn();
     this.getParammsClassifyFn();
+=======
+    console.log('参数管理')
+    console.log(this.$route.query.projectId)
+    localStorage.setItem('token',this.$route.query.token);
+    localStorage.setItem('projectId', this.$route.query.projectId);
+    this.getListFn()
+>>>>>>> 821bfc2127ddc6a59ac2ab68476e48db1dad344e
+  },
+  watch:{
+    $route:{
+      handler:function(){
+        console.log('路由变化');
+        localStorage.setItem('projectId',this.$route.query.projectId);
+        this.getListFn()
+      },
+        deep:true
+      }
   },
   methods:{
     async getParammsClassifyFn(){
@@ -110,7 +149,12 @@ export default {
     async getListFn(){
       let res = await requestApi.parameterManage.getList({
         method:'postquery',
+<<<<<<< HEAD
         params:{systemId:localStorage.getItem('projectId'),classifyId:this.categoryId}
+=======
+        params:{systemId: this.$route.query.projectId},
+        repeat:true,
+>>>>>>> 821bfc2127ddc6a59ac2ab68476e48db1dad344e
       });
       if(res){
         this.tableData=res;
