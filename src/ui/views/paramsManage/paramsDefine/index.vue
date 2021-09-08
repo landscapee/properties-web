@@ -86,12 +86,13 @@ export default {
     }
   },
   mounted(){
-    if(!localStorage.getItem('token')){
+    console.log('参数管理加载')
+    //if(!localStorage.getItem('token')){
       localStorage.setItem('token',this.$route.query.token);
-    }
-    if(!localStorage.getItem('projectId')){
+    //}
+    //if(!localStorage.getItem('projectId')){
        localStorage.setItem('projectId', this.$route.query.projectId);
-    }
+    //}
     //this.getListFn();
     this.getParammsClassifyFn();
   },
@@ -99,8 +100,11 @@ export default {
     $route:{
       handler:function(){
         console.log('路由变化');
+        console.log(this.$route.query.projectId)
         localStorage.setItem('projectId',this.$route.query.projectId);
-        this.getListFn()
+        this.categoryId='';
+        this.tableData=[];
+        this.getParammsClassifyFn()
       },
         deep:true
       }
@@ -113,7 +117,8 @@ export default {
       });
       if(res){
         console.log(res);
-        this.treeData=res
+        this.treeData=res;
+        this.postMessageFn()
       }
     },
     async deleteFn(id){
@@ -128,9 +133,7 @@ export default {
         });
         this.getListFn();
         //通知父级重新获取菜单数据
-        window.parent.postMessage({
-            state:'success'
-        }, '*');
+       this.postMessageFn()
       }
     },
     async getListFn(){
@@ -166,10 +169,13 @@ export default {
           message:"删除成功"
         });
         this.getParammsClassifyFn();
-         window.parent.postMessage({
+        this.postMessageFn()
+      }
+    },
+    postMessageFn(){
+       window.parent.postMessage({
             state:'success'
         }, '*');
-      }
     },
     handleSelect(data){
         this.categoryId=data.id;
