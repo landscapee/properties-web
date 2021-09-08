@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-07-08 10:57:07
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-07-20 10:46:16
+ * @LastEditTime: 2021-09-08 17:29:56
 -->
 <template>
    <el-form :model="form"  ref="ruleForm" label-width="160px" class="collect_form">

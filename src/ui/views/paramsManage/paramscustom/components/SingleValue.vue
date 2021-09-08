@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 15:59:44
- * @LastEditTime: 2021-09-07 11:40:29
+ * @LastEditTime: 2021-09-08 16:53:09
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\SingleValue.vue
@@ -17,16 +17,7 @@
         { required: true, message: '请输入', trigger: 'blur' },
         ]"
     >
-        <el-select v-model="item.value" multiple placeholder="请选择" v-if="item.type==='objectList'">
-          <el-option
-            v-for="item in objectList"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-        <el-input v-model="item.value"  placeholder="请输入"  v-else></el-input>
-        
+        <el-input v-model="item.value"  placeholder="请输入"></el-input>   
     </el-form-item>
 
     <el-form-item label="">

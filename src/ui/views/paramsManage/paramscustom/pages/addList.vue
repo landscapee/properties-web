@@ -3,8 +3,8 @@
  * @Author: yang fu ren
  * @version: 
  * @Date: 2021-07-07 11:32:05
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-03 16:26:37
+ * @LastEditors: yang fu ren
+ * @LastEditTime: 2021-09-08 17:24:45
 -->
 <template>
    <el-form :model="form"  ref="ruleForm" label-width="160px" class="collect_form">
@@ -17,7 +17,16 @@
             { required: true, message: '请输入', trigger: 'blur' },
             ]"
         >
-            <el-input v-model="item.value"  placeholder="请输入"></el-input>
+            <!-- <el-input v-model="item.value"  placeholder="请输入"></el-input> -->
+            <el-select v-model="item.value" multiple placeholder="请选择" v-if="item.type==='objectList'">
+                <el-option
+                    v-for="itemc in item.objectList"
+                    :key="itemc.code"
+                    :label="itemc.name"
+                    :value="itemc.code">
+                </el-option>
+            </el-select>
+            <el-input v-model="item.value"  placeholder="请输入" v-else></el-input>
         </el-form-item>
         <el-form-item label="">
             <el-button type="primary" @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
@@ -74,9 +83,36 @@ export default {
                 }else{
                     this.form.properties=objRes;
                 }
-                
-                console.log(objRes);
-                console.log(data)
+                console.log(this.form.properties)
+                 this.form.properties=this.form.properties.map((item)=>{
+                    return {
+                        code: item.code,
+                        isText: item.name,
+                        isValue: item.isValue,
+                        name: item.name,
+                        objectList:[],
+                        relateObjectId: item.relateObjectId?item.relateObjectId:[],
+                        type: item.type,
+                        value:item.value||'',
+                    }
+                })
+                this.form.properties.forEach((property,i)=>{
+                     if(property.relateObjectId){
+                         this.getParameterInfoDeFn(property.relateObjectId,i)
+                     }
+                 })
+            }
+        }, 
+        async getParameterInfoDeFn(id,i){
+            let res= await requestApi.parameterManage.getParameterInfo({
+                method:'postquery',
+                repeat:true,
+                params:{id}
+            });
+            if(res){
+                console.log(res);
+                this.form.properties[i].objectList=JSON.parse(res.properties);
+                console.log( this.form.properties)
             }
         }, 
         async addListParameterFn(){

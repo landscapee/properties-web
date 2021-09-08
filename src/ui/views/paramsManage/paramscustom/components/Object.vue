@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 15:59:44
- * @LastEditTime: 2021-07-19 15:54:49
+ * @LastEditTime: 2021-09-08 17:14:48
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\SingleValue.vue
@@ -16,8 +16,16 @@
         :rules="[
             { required: true, message: '请输入', trigger: 'blur' },
             ]"
-        >
-            <el-input v-model="item.value"  placeholder="请输入"></el-input>
+        >   
+            <el-select v-model="item.value" multiple placeholder="请选择" v-if="item.type==='objectList'">
+                <el-option
+                    v-for="itemc in item.objectList"
+                    :key="itemc.code"
+                    :label="itemc.name"
+                    :value="itemc.code">
+                </el-option>
+            </el-select>
+            <el-input v-model="item.value"  placeholder="请输入" v-else></el-input>
         </el-form-item>
         <el-form-item label="">
             <el-button type="primary" @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
@@ -37,10 +45,12 @@ export default {
             properties:[],
             id:'',
         },
+        objectList:[],
         rules:{},
     }
   },
   mounted(){
+    
     this.getObjParameterFn();
   },
   methods:{
@@ -56,15 +66,36 @@ export default {
                         name:item.name,
                         code:item.code,
                         type:item.type,
-                        value:item.value||''
+                        value:item.value||'',
+                        objectList:[],
+                        relateObjectId:item.type==='objectList'?item.relateObjectId:''
                     }
                 });
+                //  console.log(this.form.properties)
+                
               }else{
                    this.form.properties=JSON.parse(res.value);
                    this.form.id=res.id;
               }
+               this.form.properties.forEach((property,i)=>{
+                     if(property.relateObjectId){
+                         this.getParameterInfoFn(property.relateObjectId,i)
+                     }
+                 })
           }
       },
+      async getParameterInfoFn(id,i){
+            let res= await requestApi.parameterManage.getParameterInfo({
+                method:'postquery',
+                repeat:true,
+                params:{id}
+            });
+            if(res){
+                console.log(res);
+                this.form.properties[i].objectList=JSON.parse(res.properties);
+                console.log( this.form.properties)
+            }
+       }, 
       async setObjParameterFn(){
           let data={
               id:this.form.id,

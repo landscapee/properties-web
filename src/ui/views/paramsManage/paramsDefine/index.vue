@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-04-08 10:08:25
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-07 17:40:07
+ * @LastEditTime: 2021-09-08 17:45:36
 -->
 <template>
   <div style="height:100%;width:100%;display:flex">
@@ -165,7 +165,10 @@ export default {
           type:'success',
           message:"删除成功"
         });
-        this.getParammsClassifyFn()
+        this.getParammsClassifyFn();
+         window.parent.postMessage({
+            state:'success'
+        }, '*');
       }
     },
     handleSelect(data){
