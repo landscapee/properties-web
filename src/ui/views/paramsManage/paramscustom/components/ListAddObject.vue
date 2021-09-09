@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 16:40:26
- * @LastEditTime: 2021-07-20 17:16:32
+ * @LastEditTime: 2021-09-09 15:47:25
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\ListAddObject.vue
@@ -28,7 +28,16 @@
                     { required: true, message: '请输入', trigger: 'blur' },
                     ]"
                 >
-                    <el-input v-model="item.value"  placeholder="请输入"></el-input>
+                    <!-- <el-input v-model="item.value"  placeholder="请输入"></el-input> -->
+                    <el-select v-model="item.value" multiple placeholder="请选择" v-if="item.type==='objectList'">
+                        <el-option
+                            v-for="itemc in item.objectList"
+                            :key="itemc.code"
+                            :label="itemc.name"
+                            :value="itemc.code">
+                        </el-option>
+                    </el-select>
+                    <el-input v-model="item.value"  placeholder="请输入" v-else></el-input>
                 </el-form-item>
               <el-form-item label="" v-if="categoryOptions.length">
                   <el-button type="primary"  @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
@@ -97,14 +106,55 @@ export default {
                 this.form.id=res.id
                 this.form.properties=JSON.parse(res.value)
             }
+             this.form.properties=this.form.properties.map((item)=>{
+                return {
+                    code:item.code,
+                    isText:item.isText,
+                    isValue:item.isValue,
+                    name:item.name,
+                    objectList:[],
+                    relateObjectId:item.relateObjectId,
+                    type:item.type,
+                    value:item.value,
+                }
+             })
+            this.form.properties.forEach((property,i)=>{
+                if(property.relateObjectId){
+                    this.getListParameterDeFn(property.relateObjectId,i)
+                }
+            })
         }
     },
+    //  async getParameterInfoFn(id,i){
+    //         let res= await requestApi.parameterManage.getParameterInfo({
+    //             method:'postquery',
+    //             repeat:true,
+    //             params:{id}
+    //         });
+    //         if(res){
+    //             console.log(res);
+    //             this.form.properties[i].objectList=JSON.parse(res.properties);
+    //             console.log( this.form.properties)
+    //         }
+    //    }, 
+      async getListParameterDeFn(id,i){
+        let res= await requestApi.parameterManage.getListParameter({
+            method:'post',
+            data:{parameterId:id}
+        });
+        if(res){
+            console.log(res)
+            //this.tableData=res;
+             //this.form.properties[i].objectList=JSON.parse(res.properties);
+        }
+        },
     async getListParameterFn(){
       let res= await requestApi.parameterManage.getListParameter({
         method:'post',
         data:{parameterId:this.parentId}
       });
       if(res){
+          console.log(123);
           this.categoryOptions=res.map((item)=>{
               let value=JSON.parse(item.value);
               let active=value.find(itemv => {

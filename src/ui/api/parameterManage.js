@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-04-01 10:33:58
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-07 17:07:18
+ * @LastEditTime: 2021-09-09 14:25:35
  * 参数管理
  */
 export const parameterManage={
@@ -15,7 +15,7 @@ export const parameterManage={
     getList:'/api/param/api/parameterManage/list', //获取参数列表post
     getParameterInfo:'/api/param/api/parameterManage/get', //获取参数信息post
     setObjParameter:'/api/param/api/parameter-object/set', //POST对象设值
-    moveParameter:'/api/param/api/parameterManage/move', //参数排序
+    moveParameter:'/api/param/api/parameterManage/move', //参数排序post(body)
 
     getObjParameter:'/api/param/api/parameter-object/get', //获取对象的值POST
     getTextParameter:'/api/param/api/parameter-text/get', //获取单值数据post

@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 15:59:44
- * @LastEditTime: 2021-09-08 17:14:48
+ * @LastEditTime: 2021-09-09 15:25:26
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\SingleValue.vue
@@ -17,7 +17,7 @@
             { required: true, message: '请输入', trigger: 'blur' },
             ]"
         >   
-            <el-select v-model="item.value" multiple placeholder="请选择" v-if="item.type==='objectList'">
+            <el-select v-model="item.value" :multiple="item.type==='objectList'" placeholder="请选择" v-if="item.type==='objectList'||item.type==='object'">
                 <el-option
                     v-for="itemc in item.objectList"
                     :key="itemc.code"

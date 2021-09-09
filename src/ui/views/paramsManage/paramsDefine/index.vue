@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-04-08 10:08:25
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-08 17:45:36
+ * @LastEditTime: 2021-09-09 15:03:20
 -->
 <template>
   <div style="height:100%;width:100%;display:flex">
@@ -39,6 +39,7 @@
 import Ftable from '@/components/table';
 import CalssiyTree from '@/components/tree/calssiyTree';
 import requestApi from '@/api/index.js';
+import Sortable from 'sortablejs';
 export default {
   name:'paramsDefine',
   components:{Ftable,CalssiyTree},
@@ -95,6 +96,9 @@ export default {
     //}
     //this.getListFn();
     this.getParammsClassifyFn();
+     this.$nextTick(()=>{
+          this.rowDropTable()
+      })
   },
   watch:{
     $route:{
@@ -105,6 +109,9 @@ export default {
         this.categoryId='';
         this.tableData=[];
         this.getParammsClassifyFn()
+        this.$nextTick(()=>{
+          this.rowDropTable()
+        })
       },
         deep:true
       }
@@ -147,16 +154,17 @@ export default {
     },
       //移动节点
     async moveCategoriesFn(draggingNode,dropNode,dropType){
-        // let data={
-        //     id:draggingNode.data.id,
-        //     targetId:dropNode.data.id,
-        //     position:dropType,
-        // };
-        // //let r=await moveCategories(data);
-        // let r=await requestApi.globalLayer.moveCategories({method:'post',data:data})
-        // if(r){
-        //       this.getCategoriesFn();
-        // }
+        let data={
+            id:draggingNode.data.id,
+            targetId:dropNode.data.id,
+            relative:dropType,
+        };
+        //let r=await moveCategories(data);
+        let r=await requestApi.system.moveCategories({method:'post',data:data})
+        if(r){
+              this.getParammsClassifyFn();
+              this.postMessageFn()
+        }
     },
     async delateCategoryNode(data){
       let res= await requestApi.system.delete({
@@ -172,6 +180,19 @@ export default {
         this.postMessageFn()
       }
     },
+   async moveListParameterFn(id,targetId){
+      let res=await requestApi.parameterManage.moveParameter({
+        method:'post',
+        data:{
+          id,
+          targetId
+        }
+      });
+      if(res){
+        this.getParammsClassifyFn();
+        this.postMessageFn()
+      }
+    },
     postMessageFn(){
        window.parent.postMessage({
             state:'success'
@@ -180,6 +201,23 @@ export default {
     handleSelect(data){
         this.categoryId=data.id;
         this.getListFn();
+    },
+    rowDropTable(){
+        const ele = document.querySelector('.el-table__body-wrapper tbody');
+        const _this = this;
+        Sortable.create(ele, {
+            onEnd({ newIndex, oldIndex }) {
+                  let id=_this.tableData[oldIndex].id;
+                  let targetId=_this.tableData[newIndex].id;
+                  let position=oldIndex>newIndex?'before':'after';
+                  let oldRow=_this.tableData[newIndex];
+                  console.log(oldRow);
+                  const currRow = _this.tableData.splice(oldIndex, 1)[0];
+                  console.log(currRow)
+                  _this.tableData.splice(newIndex, 0, currRow);
+                  _this.moveListParameterFn(currRow.id,oldRow.id)
+            },
+        });
     },
      //获取树的节点数据
     getCurrentNode(data,type){

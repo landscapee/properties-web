@@ -9,7 +9,7 @@
     "dev": "webpack-dev-server --config webpack.dev.js --Program fpms.dev",
     "build": "webpack --config webpack.prod.js --Program fpms.build",
     "build:test": "webpack --config webpack.prod.js --Program fpms.build",
-    "test.deploy": "scp -r build/* root@173.101.3.112:/var/www/parameter",
+    "test.deploy": "scp -r build/* root@173.100.1.152:/var/www/parameter",
     "test.deploy.build": "yarn run build:test && yarn test.deploy",
     "dev.deploy": "yarn run build && yarn test.deploy"
   },

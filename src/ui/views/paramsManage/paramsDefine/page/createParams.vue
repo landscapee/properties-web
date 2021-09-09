@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-06-01 14:44:39
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-07 17:54:45
+ * @LastEditTime: 2021-09-09 15:23:57
 -->
 <template>
     <div class="createParams">
@@ -53,12 +53,14 @@
                         <el-col :span="6" style="margin-right: 5px;display:flex" >
                             <el-select v-model="item.type" placeholder="请选择" style="width:50%">
                                 <el-option label="文本" value="text"></el-option>
-                                <el-option label="数组" value="list"></el-option>
-                                <el-option label="IP" value="ip"></el-option>
-                                <el-option label="真假" value="boolean"></el-option>
-                                <el-option label="关联对象" value="objectList"></el-option>
+                                <!-- <el-option label="数组" value="list"></el-option> -->
+                                <!-- <el-option label="IP" value="ip"></el-option> -->
+                                <!-- <el-option label="真假" value="boolean"></el-option> -->
+                                <el-option label="参数" value="object"></el-option>
+                                <el-option label="参数列表" value="objectList"></el-option>
+                                
                             </el-select>
-                             <el-select style="width:50%" v-if="item.type==='objectList'" v-model="item.relateObjectId" placeholder="请选择">
+                             <el-select style="width:50%" v-if="item.type==='objectList'||item.type==='object'" v-model="item.relateObjectId" placeholder="请选择">
                                 <el-option :label="relateObject.name" :value="relateObject.id" v-for="relateObject in relateObjectLists" :key="relateObject.id"></el-option>
                             </el-select>
                         </el-col>
@@ -366,7 +368,7 @@ export default {
                 }
             }
             if(type==='add'){
-                this.form.properties.splice(index+1,0,{name:'',code:'',type:'',isText:'',isValue:''})    
+                this.form.properties.splice(index+1,0, {name:'',code:'',type:'',isText:false,isValue:false,relateObjectId:''})    
             }else if(type==='remove'){
                 if(this.form.properties.length>1){
                     this.form.properties.splice(index,1)

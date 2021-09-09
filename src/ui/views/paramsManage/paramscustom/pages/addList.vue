@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-07-07 11:32:05
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-08 17:24:45
+ * @LastEditTime: 2021-09-09 16:02:06
 -->
 <template>
    <el-form :model="form"  ref="ruleForm" label-width="160px" class="collect_form">
@@ -87,34 +87,74 @@ export default {
                  this.form.properties=this.form.properties.map((item)=>{
                     return {
                         code: item.code,
-                        isText: item.name,
+                        isText: item.isText,
                         isValue: item.isValue,
                         name: item.name,
                         objectList:[],
-                        relateObjectId: item.relateObjectId?item.relateObjectId:[],
+                        relateObjectId: item.relateObjectId?item.relateObjectId:'',
                         type: item.type,
                         value:item.value||'',
                     }
                 })
                 this.form.properties.forEach((property,i)=>{
                      if(property.relateObjectId){
-                         this.getParameterInfoDeFn(property.relateObjectId,i)
+                         this.getListParameterDeFn(property.relateObjectId,i)
                      }
                  })
             }
         }, 
-        async getParameterInfoDeFn(id,i){
-            let res= await requestApi.parameterManage.getParameterInfo({
-                method:'postquery',
-                repeat:true,
-                params:{id}
-            });
-            if(res){
-                console.log(res);
-                this.form.properties[i].objectList=JSON.parse(res.properties);
-                console.log( this.form.properties)
-            }
-        }, 
+        // async getParameterInfoDeFn(id,i){
+        //     let res= await requestApi.parameterManage.getParameterInfo({
+        //         method:'postquery',
+        //         repeat:true,
+        //         params:{id}
+        //     });
+        //     if(res){
+        //         console.log(res);
+        //         this.form.properties[i].objectList=JSON.parse(res.properties);
+        //         console.log( this.form.properties)
+        //     }
+        // }, 
+        async getListParameterDeFn(id,i){
+        let res= await requestApi.parameterManage.getListParameter({
+            method:'post',
+            data:{parameterId:id}
+        });
+        if(res){
+            console.log(res)
+            //this.tableData=res;
+            let options=[]
+           let data= res.forEach((item)=>{
+               let value=JSON.parse(item.value);
+
+                let text = null;
+                let val = null;
+
+               value.forEach((itemc,j)=>{
+                   console.log(itemc.code);
+                   console.log(itemc.value);
+
+                    if(itemc.isText){
+                        text =  itemc.value;
+                    }
+
+                    if(itemc.isValue){
+                        val = itemc.value;
+                    }
+
+               });
+               options.push({
+                   name:text,
+                   code:val
+               })
+                // console.log("------------");
+                // console.log(text);
+                //    console.log(val);
+             //console.log(JSON.parse(item.value))
+            })
+            this.form.properties[i].objectList=options;
+        }
+        },
         async addListParameterFn(){
             let data={
                 parameterId:this.parameterId,
