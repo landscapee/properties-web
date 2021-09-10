@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 15:59:44
- * @LastEditTime: 2021-09-08 16:53:09
+ * @LastEditTime: 2021-09-10 15:51:21
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\SingleValue.vue
@@ -51,26 +51,25 @@ export default {
         data:{parameterId:this.$route.query.id}
       });
       if(res){
-        if(res.code===200){
-          this.form.properties=cloneDeep(this.paramsProperties).map((item)=>{
-                    return {
-                        name:item.name,
-                        code:item.code,
-                        type:item.type,
-                        value:item.value||''
-                    }
-                });
-        }else{
-          this.form.properties=JSON.parse(res.value);
-          this.form.id=res.id;
-        }
+        console.log(res);
+        console.log(this.paramsProperties);
+         this.form.properties=this.paramsProperties.map(item=>{
+              return {
+                  name:item.name,
+                  code:item.code,
+                  type:item.type,
+                  value:res.value||''
+              }
+          });
+           this.form.id=res.id||'';
       }
     },
     async setTextParameter(){
+      console.log(this.form.properties)
        let data={
               id:this.form.id,
               parameterId:this.$route.query.id,
-              value:JSON.stringify(this.form.properties)
+              value:this.form.properties[0].value
           };
           let res =await requestApi.parameterManage.setTextParameter({
               method:'post',
@@ -86,6 +85,7 @@ export default {
     submitForm(){
       this.$refs['ruleForm'].validate((valid) => {
       if (valid) {
+        console.log(this.form.properties)
           this.setTextParameter();
       } else {
           console.error('error submit!!');

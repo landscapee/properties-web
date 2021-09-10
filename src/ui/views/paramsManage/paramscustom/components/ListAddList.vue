@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 16:40:26
- * @LastEditTime: 2021-07-20 15:07:45
+ * @LastEditTime: 2021-09-10 17:07:00
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\ListAddObject.vue
@@ -71,13 +71,13 @@ export default {
        return {
          prop:item.code,
          label:item.name,
-         formatter:(row)=>{
-          let value=JSON.parse(row.value);
-          let currentData = value.find((itemc)=>{
-            return itemc.code===item.code
-          });
-          return currentData.value
-         },
+        //  formatter:(row)=>{
+        //   let value=JSON.parse(row.value);
+        //   let currentData = value.find((itemc)=>{
+        //     return itemc.code===item.code
+        //   });
+        //   return currentData.value
+        //  },
          align:'center'
        }
      });
@@ -98,8 +98,31 @@ export default {
             }
         });
         if(res){
-            this.tableData=res;
+            this.tableData=res.map((item)=>{
+                let value=JSON.parse(item.value);
+                return {
+                    deleted:item.deleted,
+                    id:item.id,
+                    parameterId:item.parameterId,
+                    position:item.position,
+                    ...value
+                }
+            });
         }
+    },
+    //处理显示字段和值字段
+    handleValueAndText(data){
+        console.log(data)
+        let value={isText:'',isValue:''};
+        data.forEach(item => {
+            if(item.isText){ //显示字段
+                value['isText']=item.code
+            }
+            if(item.isValue){ //值字段
+                value['isValue']=item.code
+            }
+        });
+        return value
     },
     //获取左侧数据
     async getListParameterFn(){
@@ -108,18 +131,24 @@ export default {
         data:{parameterId:this.parentId}
       });
       if(res){
-          this.categoryOptions=res.map((item)=>{
+          //显示字段和值字段
+          //let textandvalue=this.handleValueAndText(this.paramsProperties);
+          this.categoryOptions=res.map(item=>{
               let value=JSON.parse(item.value);
-              let active=value.find(itemv => {
-                  return itemv.isText===true;
-              });
+               console.log(value)
               return {
-                  name:active.value,
-                  id:item.id,
-                  parameterId:item.parameterId,
-                  value:item.value
+                    deleted: item.deleted,
+                    id: item.id,
+                    parameterId: item.parameterId,
+                    position: item.position,
+                    ...value,
+                    // name:value[textandvalue['isText']],
+                    // value:value[textandvalue['isValue']]
               }
+             
           });
+          console.log( this.categoryOptions)
+        //获取右表格数据
           if(this.categoryOptions.length){
                this.handleClickCategory(this.categoryOptions[0])
           }
@@ -177,7 +206,7 @@ export default {
     handleAdd(){
         this.$router.push({
             path:'addListAddList',
-            query:{isEdit:false,parameterId:this.$route.query.id,parentDataId:this.categoryId},
+            query:{isEdit:false,parameterId:this.$route.query.id,parentDataId:this.categoryId,properties:[...this.paramsProperties]},
         })
     },
     handleClickDelete(row){
@@ -198,7 +227,7 @@ export default {
     handleClickEdit(row){
         this.$router.push({
             path:'addListAddList',
-            query:{isEdit:true,parameterId:this.$route.query.id,parentDataId:this.categoryId,row:JSON.stringify(row)},
+            query:{isEdit:true,parameterId:this.$route.query.id,parentDataId:this.categoryId,...row,properties:[...this.paramsProperties]},
         })
     },
     handleCurrentChange(current){

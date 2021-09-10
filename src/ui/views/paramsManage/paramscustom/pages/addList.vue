@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-07-07 11:32:05
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-09 16:02:06
+ * @LastEditTime: 2021-09-10 15:28:39
 -->
 <template>
    <el-form :model="form"  ref="ruleForm" label-width="160px" class="collect_form">
@@ -14,11 +14,11 @@
         :key="index"
         :prop="'properties.' + index + '.value'"
         :rules="[
-            { required: true, message: '请输入', trigger: 'blur' },
+            { required: item.isRequired, message: '请输入', trigger: 'blur' },
             ]"
         >
             <!-- <el-input v-model="item.value"  placeholder="请输入"></el-input> -->
-            <el-select v-model="item.value" multiple placeholder="请选择" v-if="item.type==='objectList'">
+            <el-select v-model="item.value" :multiple="item.type==='objectList'" placeholder="请选择" v-if="item.type==='objectList'||item.type==='object'">
                 <el-option
                     v-for="itemc in item.objectList"
                     :key="itemc.code"
@@ -52,113 +52,72 @@ export default {
         let query=this.$route.query;
         this.parameterId=query.parameterId;
         this.isEdit=query.isEdit;
-        console.log('tag', this.isEdit)
+        console.log(query)
+        this.handleProperties(query)
         if(this.isEdit){
             this.id=query.id;
-            //this.form.properties=JSON.parse(query.value);
-            this.getParameterInfoFn(JSON.parse(query.value));
-        }else{
-            this.getParameterInfoFn();
         }
         
     },
     methods:{
-        async getParameterInfoFn(data){
-            let res= await requestApi.parameterManage.getParameterInfo({
-                method:'postquery',
-                params:{id:this.parameterId}
+        //处理显示字段和值字段
+        handleValueAndText(data){
+            let value={isText:'',isValue:''};
+            data.forEach(item => {
+                if(item.isText){ //显示字段
+                    value['isText']=item.code
+                }
+                if(item.isValue){ //值字段
+                    value['isValue']=item.code
+                }
+            });
+            return value
+        },
+        //处理渲染数据
+        handleProperties(data){
+            this.form.properties=data.properties.map((item,i)=>{
+                //当参数配置有relateObjectId时要获取对应的管理数据
+                if(item.relateObjectId){
+                    this.getListParameterDeFn(item.relateObjectId,i)
+                }
+               return {
+                    code: item.code,
+                    isText: item.isText,
+                    isValue: item.isValue,
+                    name: item.name,
+                    objectList:[],
+                    relateObjectId: item.relateObjectId?item.relateObjectId:'',
+                    type: item.type,
+                    isRequired:item.isRequired,
+                    value:data[item.code]?data[item.code]:'',
+               }
+           });
+
+        },
+        async getListParameterDeFn(id,i){
+            let res= await requestApi.parameterManage.getListParameter({
+                method:'post',
+                repeat:true,
+                data:{parameterId:id}
             });
             if(res){
-                this.paramsType=res.type;
-                let objRes= JSON.parse(res.properties);
-                if(data){
-                    objRes.forEach((item,i) => {
-                        data.forEach((citem,j)=>{
-                            if(item.code===citem.code){
-                                objRes.splice(i,1,citem)
-                            }
-                        })
+                this.form.properties[i].objectList=res.map(item=>{
+                    let value=JSON.parse(item.value);
+                        return {
+                            id:item.id,
+                            ...value
+                        }
                     });
-                    this.form.properties=objRes;
-                }else{
-                    this.form.properties=objRes;
                 }
-                console.log(this.form.properties)
-                 this.form.properties=this.form.properties.map((item)=>{
-                    return {
-                        code: item.code,
-                        isText: item.isText,
-                        isValue: item.isValue,
-                        name: item.name,
-                        objectList:[],
-                        relateObjectId: item.relateObjectId?item.relateObjectId:'',
-                        type: item.type,
-                        value:item.value||'',
-                    }
-                })
-                this.form.properties.forEach((property,i)=>{
-                     if(property.relateObjectId){
-                         this.getListParameterDeFn(property.relateObjectId,i)
-                     }
-                 })
-            }
-        }, 
-        // async getParameterInfoDeFn(id,i){
-        //     let res= await requestApi.parameterManage.getParameterInfo({
-        //         method:'postquery',
-        //         repeat:true,
-        //         params:{id}
-        //     });
-        //     if(res){
-        //         console.log(res);
-        //         this.form.properties[i].objectList=JSON.parse(res.properties);
-        //         console.log( this.form.properties)
-        //     }
-        // }, 
-        async getListParameterDeFn(id,i){
-        let res= await requestApi.parameterManage.getListParameter({
-            method:'post',
-            data:{parameterId:id}
-        });
-        if(res){
-            console.log(res)
-            //this.tableData=res;
-            let options=[]
-           let data= res.forEach((item)=>{
-               let value=JSON.parse(item.value);
-
-                let text = null;
-                let val = null;
-
-               value.forEach((itemc,j)=>{
-                   console.log(itemc.code);
-                   console.log(itemc.value);
-
-                    if(itemc.isText){
-                        text =  itemc.value;
-                    }
-
-                    if(itemc.isValue){
-                        val = itemc.value;
-                    }
-
-               });
-               options.push({
-                   name:text,
-                   code:val
-               })
-                // console.log("------------");
-                // console.log(text);
-                //    console.log(val);
-             //console.log(JSON.parse(item.value))
-            })
-            this.form.properties[i].objectList=options;
-        }
         },
         async addListParameterFn(){
+            let value={};
+            this.form.properties.forEach((item)=>{
+                value[item.code]=item.value;
+            });
             let data={
                 parameterId:this.parameterId,
-                value:JSON.stringify(this.form.properties)
+                value:JSON.stringify(value)
             };
           
             let res= await requestApi.parameterManage.addListParameter({
@@ -174,10 +133,14 @@ export default {
             }
         },
         async updateListParameterFn(){
+            let value={};
+            this.form.properties.forEach((item)=>{
+                value[item.code]=item.value;
+            });
             let data={
                 id:this.id,
                 parameterId:this.parameterId,
-                value:JSON.stringify(this.form.properties)
+                value:JSON.stringify(value)
             };
             let res= await requestApi.parameterManage.updateListParameter({
                 method:'post',
@@ -195,8 +158,10 @@ export default {
             this.$refs['ruleForm'].validate((valid) => {
             if (valid) {
                if(this.isEdit){
+                   console.log(this.form.properties)
                    this.updateListParameterFn()
                }else{
+                   console.log(this.form.properties)
                    this.addListParameterFn()
                }
             } else {

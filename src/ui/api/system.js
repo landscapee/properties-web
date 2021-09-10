@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-09-07 10:40:06
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-09 14:25:49
+ * @LastEditTime: 2021-09-09 16:41:51
  */
 export const system={
     save:'/api/param/api/system/save', //参数添加post(body)

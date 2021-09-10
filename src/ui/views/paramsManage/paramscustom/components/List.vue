@@ -3,8 +3,8 @@
  * @Author: yang fu ren
  * @version: 
  * @Date: 2021-04-08 10:08:25
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2021-08-03 08:24:34
+ * @LastEditors: yang fu ren
+ * @LastEditTime: 2021-09-10 14:54:58
 -->
 <template>
   <div style="height:100%;width:100%">
@@ -48,25 +48,29 @@ export default {
       },
       tableConfig:[
             {type: 'index',label: '序号',align: 'center'},
+            // {prop:"name",label:"名称"},
+            // {prop:"code",label:"编码"},
             { slot: 'operation' },
 	    ]
     }
   },
   mounted(){
+     console.log(this.paramsProperties)
      let tableConfig=this.paramsProperties.map((item)=>{
        return {
          prop:item.code,
          label:item.name,
-         formatter:(row)=>{
-          let value=JSON.parse(row.value);
-          let currentData = value.find((itemc)=>{
-            return itemc.code===item.code
-          });
-          return currentData?currentData.value:''
-         },
+        //  formatter:(row)=>{
+        //   let value=JSON.parse(row.value);
+        //   let currentData = value.find((itemc)=>{
+        //     return itemc.code===item.code
+        //   });
+        //   return currentData?currentData.value:''
+        //  },
          align:'center'
        }
      });
+     console.log(tableConfig)
      this.tableConfig.push(...tableConfig);
      this.getListParameterFn();
      this.$nextTick(()=>{
@@ -80,7 +84,16 @@ export default {
         data:{parameterId:this.$route.query.id}
       });
       if(res){
-        this.tableData=res;
+        this.tableData=res.map((item)=>{
+            let value=JSON.parse(item.value);
+            return {
+              deleted:item.deleted,
+              id:item.id,
+              parameterId:item.parameterId,
+              position:item.position,
+              ...value
+            }
+        });
       }
     },
     async deleteListParameter(id){
@@ -129,7 +142,7 @@ export default {
     handleAdd(){
       this.$router.push({
         path:'addList',
-        query:{isEdit:false,parameterId:this.$route.query.id},
+        query:{isEdit:false,parameterId:this.$route.query.id,properties:[...this.paramsProperties]},
       })
     },
     handleClickDelete(row){
@@ -152,7 +165,7 @@ export default {
     handleClickEdit(row){
       this.$router.push({
         path:'addList',
-        query:{isEdit:true,parameterId:this.$route.query.id,id:row.id,value:row.value},
+        query:{isEdit:true,parameterId:this.$route.query.id,...row,properties:[...this.paramsProperties]},
       })
     },
     handleCurrentChange(current){

@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-06-01 14:44:39
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-09 15:23:57
+ * @LastEditTime: 2021-09-10 17:50:05
 -->
 <template>
     <div class="createParams">
@@ -40,8 +40,9 @@
                         <el-col :span="3" style="margin-right: 5px;font-size:16px">属性名称</el-col>
                         <el-col :span="3" style="margin-right: 5px;font-size:16px">属性编码</el-col>
                         <el-col :span="6" style="margin-right: 5px;font-size:16px">属性类型</el-col>
-                        <el-col :span="3" style="margin-right: 5px;font-size:16px;text-align:center">展示字段</el-col>
-                        <el-col :span="3" style="margin-right: 5px;font-size:16px;text-align:center">值字段</el-col>
+                        <el-col :span="2" style="margin-right: 5px;font-size:16px;text-align:center">是否必填</el-col>
+                        <el-col :span="2" style="margin-right: 5px;font-size:16px;text-align:center">展示字段</el-col>
+                        <el-col :span="2" style="margin-right: 5px;font-size:16px;text-align:center">值字段</el-col>
                     </el-row>
                     <el-row v-for="(item,index) in form.properties" :key="index">
                         <el-col :span="3" style="margin-right: 5px">
@@ -64,10 +65,13 @@
                                 <el-option :label="relateObject.name" :value="relateObject.id" v-for="relateObject in relateObjectLists" :key="relateObject.id"></el-option>
                             </el-select>
                         </el-col>
-                        <el-col :span="3" style="margin-right: 5px;text-align:center">
+                         <el-col :span="2" style="margin-right: 5px;text-align:center">
+                            <el-checkbox v-model="item.isRequired"></el-checkbox>
+                        </el-col> 
+                        <el-col :span="2" style="margin-right: 5px;text-align:center">
                             <el-checkbox v-model="item.isText" @change="changIsText(index)"></el-checkbox>
                         </el-col> 
-                        <el-col :span="3" style="margin-right: 5px;text-align:center">
+                        <el-col :span="2" style="margin-right: 5px;text-align:center">
                             <el-checkbox v-model="item.isValue" @change="changIsValue(index)"></el-checkbox>
                         </el-col>    
                         <el-col :span="5" >
@@ -89,6 +93,9 @@
                     <el-checkbox label="多版本" name="type"></el-checkbox>
                     </el-checkbox-group>
                 </el-form-item> -->
+                <el-form-item label="允许编辑">
+                    <el-checkbox v-model="form.isAllowEdit" ></el-checkbox>
+                </el-form-item>
                 <el-form-item label="参数描述">
                     <el-input v-model="form.comment"  placeholder="请输入参数描述" type="textarea"></el-input>
                 </el-form-item>
@@ -154,6 +161,7 @@ export default {
         return { 
             paramsId:'',
             isEdit:false,
+            isAllowEdit:false,
             parentList:[],
             parentOptions:[],
             checked:'',
@@ -172,12 +180,11 @@ export default {
                 name:'',
                 type:'OBJECT',
                 properties:[
-                    {name:'',code:'',type:'',isText:true,isValue:true,relateObjectId:''}
+                    {name:'',code:'',type:'',isText:true,isValue:true,relateObjectId:'',isRequired:false,}
                 ],
                 properties2:'',
                 comment:'',
                 parentId:'',
-               
             },
             fileList:[],
              rules:{
@@ -368,7 +375,7 @@ export default {
                 }
             }
             if(type==='add'){
-                this.form.properties.splice(index+1,0, {name:'',code:'',type:'',isText:false,isValue:false,relateObjectId:''})    
+                this.form.properties.splice(index+1,0, {name:'',code:'',type:'',isText:false,isValue:false,relateObjectId:'',isRequired:false,})    
             }else if(type==='remove'){
                 if(this.form.properties.length>1){
                     this.form.properties.splice(index,1)

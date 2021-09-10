@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 16:40:26
- * @LastEditTime: 2021-09-09 15:47:25
+ * @LastEditTime: 2021-09-10 17:09:12
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\ListAddObject.vue
@@ -29,7 +29,7 @@
                     ]"
                 >
                     <!-- <el-input v-model="item.value"  placeholder="请输入"></el-input> -->
-                    <el-select v-model="item.value" multiple placeholder="请选择" v-if="item.type==='objectList'">
+                    <el-select v-model="item.value" :multiple="item.type==='objectList'" placeholder="请选择" v-if="item.type==='objectList'||item.type==='object'">
                         <el-option
                             v-for="itemc in item.objectList"
                             :key="itemc.code"
@@ -125,48 +125,58 @@ export default {
             })
         }
     },
-    //  async getParameterInfoFn(id,i){
-    //         let res= await requestApi.parameterManage.getParameterInfo({
-    //             method:'postquery',
-    //             repeat:true,
-    //             params:{id}
-    //         });
-    //         if(res){
-    //             console.log(res);
-    //             this.form.properties[i].objectList=JSON.parse(res.properties);
-    //             console.log( this.form.properties)
-    //         }
-    //    }, 
       async getListParameterDeFn(id,i){
         let res= await requestApi.parameterManage.getListParameter({
-            method:'post',
-            data:{parameterId:id}
-        });
-        if(res){
-            console.log(res)
-            //this.tableData=res;
-             //this.form.properties[i].objectList=JSON.parse(res.properties);
-        }
+                method:'post',
+                repeat:true,
+                data:{parameterId:id}
+            });
+            if(res){
+                this.form.properties[i].objectList=res.map(item=>{
+                    let value=JSON.parse(item.value);
+                        return {
+                            id:item.id,
+                            ...value
+                        }
+                    });
+                }
         },
+     //处理显示字段和值字段
+    handleValueAndText(data){
+        let value={isText:'',isValue:''};
+        data.forEach(item => {
+            if(item.isText){ //显示字段
+                value['isText']=item.code
+            }
+            if(item.isValue){ //值字段
+                value['isValue']=item.code
+            }
+        });
+        return value
+    },
     async getListParameterFn(){
       let res= await requestApi.parameterManage.getListParameter({
         method:'post',
         data:{parameterId:this.parentId}
       });
       if(res){
-          console.log(123);
-          this.categoryOptions=res.map((item)=>{
+          console.log(res)
+          //显示字段和值字段
+          let textandvalue=this.handleValueAndText(this.paramsProperties);
+          this.categoryOptions=res.map(item=>{
               let value=JSON.parse(item.value);
-              let active=value.find(itemv => {
-                  return itemv.isText===true;
-              });
               return {
-                  name:active.value,
-                  id:item.id,
-                  parameterId:item.parameterId,
-                  value:item.value
+                    deleted: item.deleted,
+                    id: item.id,
+                    parameterId: item.parameterId,
+                    position: item.position,
+                    ...value
+                    // name:value[textandvalue['isText']],
+                    // value:value[textandvalue['isValue']]
               }
+             
           });
+        //获取右表格数据
           if(this.categoryOptions.length){
                this.handleClickCategory(this.categoryOptions[0])
           }

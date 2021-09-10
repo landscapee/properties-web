@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-24 15:59:44
- * @LastEditTime: 2021-09-09 15:25:26
+ * @LastEditTime: 2021-09-10 16:20:03
  * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\components\SingleValue.vue
@@ -14,7 +14,7 @@
         :key="index"
         :prop="'properties.' + index + '.value'"
         :rules="[
-            { required: true, message: '请输入', trigger: 'blur' },
+            { required: item.isRequired, message: '请输入', trigger: 'blur' },
             ]"
         >   
             <el-select v-model="item.value" :multiple="item.type==='objectList'" placeholder="请选择" v-if="item.type==='objectList'||item.type==='object'">
@@ -45,37 +45,59 @@ export default {
             properties:[],
             id:'',
         },
-        objectList:[],
         rules:{},
     }
   },
   mounted(){
-    
     this.getObjParameterFn();
   },
   methods:{
+      //处理渲染数据
+       handleProperties(data){
+            this.form.properties=data.map((item,i)=>{
+                //当参数配置有relateObjectId时要获取对应的管理数据
+               return {
+                    code: item.code,
+                    isText: item.isText,
+                    isValue: item.isValue,
+                    name: item.name,
+                    objectList:[],
+                    relateObjectId: item.relateObjectId?item.relateObjectId:'',
+                    type: item.type,
+                    isRequired:item.isRequired,
+                    value:'',
+               }
+           });
+
+        },
       async getObjParameterFn(){
           let res = await requestApi.parameterManage.getObjParameter({
               method:'post',
               data:{parameterId:this.$route.query.id}
           });
           if(res){
-              if(res.code===200){ //表示没有值
-                 this.form.properties=cloneDeep(this.paramsProperties).map((item)=>{
-                    return {
-                        name:item.name,
-                        code:item.code,
-                        type:item.type,
-                        value:item.value||'',
-                        objectList:[],
-                        relateObjectId:item.type==='objectList'?item.relateObjectId:''
-                    }
-                });
-                //  console.log(this.form.properties)
-                
+              console.log(res)
+              
+              if(res.code===200){ //说明还没有绑定值
+                    this.handleProperties(this.paramsProperties)
               }else{
-                   this.form.properties=JSON.parse(res.value);
-                   this.form.id=res.id;
+                  let value=JSON.parse(res.value);
+                  console.log(value)
+                   console.log(this.paramsProperties)
+                  this.form.id=res.id;
+                  this.form.properties=this.paramsProperties.map(item=>{
+                      return {
+                            code: item.code,
+                            isText: item.isText,
+                            isValue: item.isValue,
+                            name: item.name,
+                            objectList:[],
+                            relateObjectId: item.relateObjectId?item.relateObjectId:'',
+                            type: item.type,
+                            isRequired:item.isRequired,
+                            value:value[item.code],
+                      }
+                  })
               }
                this.form.properties.forEach((property,i)=>{
                      if(property.relateObjectId){
@@ -85,22 +107,31 @@ export default {
           }
       },
       async getParameterInfoFn(id,i){
-            let res= await requestApi.parameterManage.getParameterInfo({
-                method:'postquery',
+           let res= await requestApi.parameterManage.getListParameter({
+                method:'post',
                 repeat:true,
-                params:{id}
+                data:{parameterId:id}
             });
             if(res){
-                console.log(res);
-                this.form.properties[i].objectList=JSON.parse(res.properties);
-                console.log( this.form.properties)
-            }
+               this.form.properties[i].objectList=res.map(item=>{
+                    let value=JSON.parse(item.value);
+                        return {
+                            id:item.id,
+                            ...value
+                        }
+                    });
+                }
+            
        }, 
       async setObjParameterFn(){
+           let value={};
+            this.form.properties.forEach((item)=>{
+                value[item.code]=item.value;
+            });
           let data={
               id:this.form.id,
               parameterId:this.$route.query.id,
-              value:JSON.stringify(this.form.properties)
+              value:JSON.stringify(value)
           };
           let res =await requestApi.parameterManage.setObjParameter({
               method:'post',

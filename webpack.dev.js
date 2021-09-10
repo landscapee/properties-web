@@ -4,7 +4,7 @@
  * @Author: xdh.ss
  * @Date: 2020-04-08 12:12:33
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-07 17:45:30
+ * @LastEditTime: 2021-09-09 16:26:20
  */
 const merge = require('webpack-merge');
 const argv = require('yargs').argv;
@@ -14,7 +14,7 @@ const webpack = require('webpack');
 let port = 8000;
 
 if (argv.Program === 'fpms.dev') {
-    port = 6066;
+    port = 8088;
 }
 ;
 

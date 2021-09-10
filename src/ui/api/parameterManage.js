@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-04-01 10:33:58
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-09 14:25:35
+ * @LastEditTime: 2021-09-09 16:42:06
  * 参数管理
  */
 export const parameterManage={
