@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-06-01 14:44:39
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-10 17:50:05
+ * @LastEditTime: 2021-09-10 17:54:31
 -->
 <template>
     <div class="createParams">
@@ -161,7 +161,7 @@ export default {
         return { 
             paramsId:'',
             isEdit:false,
-            isAllowEdit:false,
+            
             parentList:[],
             parentOptions:[],
             checked:'',
@@ -185,6 +185,7 @@ export default {
                 properties2:'',
                 comment:'',
                 parentId:'',
+                isAllowEdit:true,
             },
             fileList:[],
              rules:{
@@ -223,7 +224,8 @@ export default {
                     code:data.code,
                     comment:data.comment,
                     properties2:JSON.parse(data.properties)[0].type,
-                    parentId:data.parentId||''
+                    parentId:data.parentId||'',
+                    isAllowEdit:data.isAllowEdit,
                 })
             }else{
                  this.form=Object.assign({},this.form,{
@@ -233,7 +235,8 @@ export default {
                     code:data.code,
                     comment:data.comment,
                     properties:JSON.parse(data.properties),
-                    parentId:data.parentId||''
+                    parentId:data.parentId||'',
+                    isAllowEdit:data.isAllowEdit,
                 })
                 console.log(this.form.type)
                
