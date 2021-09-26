@@ -1,8 +1,8 @@
 <!--
  * @Author: your name
  * @Date: 2021-06-23 14:30:28
- * @LastEditTime: 2021-07-28 09:26:43
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-09-26 17:37:36
+ * @LastEditors: yang fu ren
  * @Description: In User Settings Edit
  * @FilePath: \properties-web\src\ui\views\paramsManage\paramscustom\index.vue
 -->

@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-04-08 10:08:25
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-09 15:03:20
+ * @LastEditTime: 2021-09-26 17:10:11
 -->
 <template>
   <div style="height:100%;width:100%;display:flex">
@@ -18,7 +18,7 @@
       <div class="title_box">
           <div style="margin-left: auto;">
                <el-button class="add_btn" @click="handleCreateParams" type="primary" v-if="categoryId">新建参数</el-button>
-          </div>     
+          </div>
       </div>
       <Ftable :data="tableData" :tableConfig="tableConfig" :offsetTop="100" @handleSizeChange="handleSizeChange" @handleCurrentChange="handleCurrentChange">
           <el-table-column slot="operation" :width="150" fixed="right" label="操作" align="center">

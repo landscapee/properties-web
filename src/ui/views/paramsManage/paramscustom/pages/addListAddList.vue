@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-07-07 11:32:05
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-10 15:28:28
+ * @LastEditTime: 2021-09-26 17:54:09
 -->
 <template>
    <el-form :model="form"  ref="ruleForm" label-width="160px" class="collect_form">
@@ -27,6 +27,7 @@
                 </el-option>
             </el-select>
             <el-input v-model="item.value"  placeholder="请输入" v-else></el-input>
+            <el-button @click="handleMap">选取坐标</el-button>
         </el-form-item>
         <el-form-item label="">
             <el-button type="primary" @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
@@ -47,19 +48,40 @@ export default {
             parentDataId:'',
             id:'',
             isEdit:false,
+            gisInfo:{
+                coordinates:[],
+                type:''
+            },
         }
     },
     mounted(){
+         window.addEventListener('message',(e)=>{
+           if(e.data&&e.data.command==='drawMapcoordinates'){
+                let coordinates=e.data.args.coordinates;
+                this.handleMapData({coordinates,type:''})
+           }
+        })  
         let query=this.$route.query;
         this.parameterId=query.parameterId;
         this.parentDataId=query.parentDataId;
         this.isEdit=query.isEdit;
-         this.handleProperties(query)
+        this.handleProperties(query)
         if(this.isEdit){
             this.id=query.id;
         }
+       
     },
     methods:{
+        handleMapData(data){
+            console.log(data);
+            console.log(this.form)
+        },
+        handleMap(){
+            console.log(this.form.properties)
+            window.parent.postMessage({
+                    state:'drapMap'
+                }, '*');
+        },
          //处理渲染数据
         handleProperties(data){
             this.form.properties=data.properties.map((item,i)=>{
