@@ -20,5 +20,6 @@ const getters={
     activeLayerList:(state)=>state.layer.activeLayerList,
     userInfo:(state)=>state.user.userInfo,
     currentProject:(state)=>state.project.currentProject,
+    getGisinfo:(state)=>state.baseInfo.gisInfo
 };
 export default getters

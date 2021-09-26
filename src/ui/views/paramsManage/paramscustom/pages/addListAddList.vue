@@ -27,7 +27,7 @@
                 </el-option>
             </el-select>
             <el-input v-model="item.value"  placeholder="请输入" v-else></el-input>
-            <el-button @click="handleMap">选取坐标</el-button>
+            <el-button @click="handleMap" v-if="item.type==='gismap'">选取坐标</el-button>
         </el-form-item>
         <el-form-item label="">
             <el-button type="primary" @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
@@ -37,6 +37,8 @@
 
 <script>
 import requestApi from '@/api/index.js';
+import {mapGetters} from "vuex"
+import { constants, copyFileSync } from 'fs';
 export default {
     name:'addList',
     data(){
@@ -54,13 +56,30 @@ export default {
             },
         }
     },
+    computed:{
+        ...mapGetters(['getGisinfo'])
+    },
+    watch:{
+        getGisinfo:{
+            handler:function(){
+                console.log('111')
+                console.log(this.form)
+                console.log(this.getGisinfo)
+                let coordinates=[...this.getGisinfo.coordinates]
+                console.log(coordinates)
+                this.form.properties.forEach(item=>{
+                    if(item.type==='gismap'){
+                        console.log('地图数据');
+                        item.value=JSON.stringify(coordinates)
+                    }
+                })
+                console.log(this.form.properties)
+            },
+            deep:true
+        }
+    },
     mounted(){
-         window.addEventListener('message',(e)=>{
-           if(e.data&&e.data.command==='drawMapcoordinates'){
-                let coordinates=e.data.args.coordinates;
-                this.handleMapData({coordinates,type:''})
-           }
-        })  
+        console.log(this.getGisinfo)
         let query=this.$route.query;
         this.parameterId=query.parameterId;
         this.parentDataId=query.parentDataId;
@@ -143,7 +162,9 @@ export default {
             }
         },
         async updateListParameterFn(){
-             let value={};
+            console.log(this.gisInfo);
+            console.log(this.form)
+            let value={};
             this.form.properties.forEach((item)=>{
                 value[item.code]=item.value;
             });

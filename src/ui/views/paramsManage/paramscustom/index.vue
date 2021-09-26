@@ -44,6 +44,15 @@ export default {
   },
   mounted(){
        this.getParameterInfoFn()
+        window.addEventListener('message',(e)=>{
+           if(e.data&&e.data.command==='drawMapcoordinates'){
+               console.log('监听信息')
+                let coordinates=e.data.args.coordinates;
+                console.log(e.data.args)
+                this.$store.commit('setGisInfo',{...e.data.args})
+                //this.handleMapData({coordinates,type:''})
+           }
+        })  
   },
   watch:{
       $route: {

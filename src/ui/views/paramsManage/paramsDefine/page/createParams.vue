@@ -59,7 +59,7 @@
                                 <!-- <el-option label="真假" value="boolean"></el-option> -->
                                 <el-option label="参数" value="object"></el-option>
                                 <el-option label="参数列表" value="objectList"></el-option>
-                                
+                                 <el-option label="地图数据" value="gismap"></el-option>
                             </el-select>
                              <el-select style="width:50%" v-if="item.type==='objectList'||item.type==='object'" v-model="item.relateObjectId" placeholder="请选择">
                                 <el-option :label="relateObject.name" :value="relateObject.id" v-for="relateObject in relateObjectLists" :key="relateObject.id"></el-option>
