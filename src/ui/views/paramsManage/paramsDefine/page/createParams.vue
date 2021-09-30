@@ -54,12 +54,12 @@
                         <el-col :span="6" style="margin-right: 5px;display:flex" >
                             <el-select v-model="item.type" placeholder="请选择" style="width:50%">
                                 <el-option label="文本" value="text"></el-option>
-                                <!-- <el-option label="数组" value="list"></el-option> -->
-                                <!-- <el-option label="IP" value="ip"></el-option> -->
-                                <!-- <el-option label="真假" value="boolean"></el-option> -->
+                                <el-option label="布尔" value="bool"></el-option>
                                 <el-option label="参数" value="object"></el-option>
                                 <el-option label="参数列表" value="objectList"></el-option>
-                                 <el-option label="地图数据" value="gismap"></el-option>
+                                <el-option label="地图点" value="point"></el-option>
+                                <el-option label="地图线" value="line"></el-option>
+                                <el-option label="地图面" value="polygon"></el-option>
                             </el-select>
                              <el-select style="width:50%" v-if="item.type==='objectList'||item.type==='object'" v-model="item.relateObjectId" placeholder="请选择">
                                 <el-option :label="relateObject.name" :value="relateObject.id" v-for="relateObject in relateObjectLists" :key="relateObject.id"></el-option>
@@ -94,7 +94,7 @@
                     </el-checkbox-group>
                 </el-form-item> -->
                 <el-form-item label="允许编辑">
-                    <el-checkbox v-model="form.isAllowEdit" ></el-checkbox>
+                    <el-checkbox v-model="form.editable" ></el-checkbox>
                 </el-form-item>
                 <el-form-item label="参数描述">
                     <el-input v-model="form.comment"  placeholder="请输入参数描述" type="textarea"></el-input>
@@ -185,7 +185,7 @@ export default {
                 properties2:'',
                 comment:'',
                 parentId:'',
-                isAllowEdit:true,
+                editable:true,
             },
             fileList:[],
              rules:{
@@ -225,7 +225,7 @@ export default {
                     comment:data.comment,
                     properties2:JSON.parse(data.properties)[0].type,
                     parentId:data.parentId||'',
-                    isAllowEdit:data.isAllowEdit,
+                    editable:data.editable,
                 })
             }else{
                  this.form=Object.assign({},this.form,{
@@ -236,7 +236,7 @@ export default {
                     comment:data.comment,
                     properties:JSON.parse(data.properties),
                     parentId:data.parentId||'',
-                    isAllowEdit:data.isAllowEdit,
+                     editable:data.editable,
                 })
                 console.log(this.form.type)
                

@@ -22,6 +22,9 @@ import Logger from './lib/logger';
 import './src/ui/config/ui';
 import '@/permission';
 import generateDirective from './vueConfig/directive.js';
+
+import axios from 'axios';
+
 generateDirective(Vue)
 //import '@/api'; //注册所有请求api
 Vue.use(ElementUI);
@@ -30,6 +33,7 @@ Vue.use(ElementUI);
 Vue.prototype.$uuid = uuidv4;
 Vue.prototype.$logger = Logger;
 Vue.prototype.$subscribeMap = {};
+Vue.prototype.$axios = axios;
 router.afterEach((to, from) => {
     
 })
