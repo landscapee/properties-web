@@ -13,7 +13,7 @@
                 <el-button class="add_btn" type="primary" @click="handleAdd">添加</el-button>
             </div>
         </div>
-        <Ftable :data="tableData" :tableConfig="tableConfig" :offsetTop="47" @handleCurrentChange="handleCurrentChange">
+        <Ftable :data="tableData" :tableConfig="tableConfig" :offsetTop="47" @handleCurrentChange="handleCurrentChange" @draw="handleMap1">
             <el-table-column v-if="editable" slot="operation" :width="150" fixed="right" label="操作" align="center">
               <span slot-scope="{ row }" class="operation">
                    <span title="编辑" class="icon_box" @click="handleClickEdit(row)">
@@ -24,7 +24,7 @@
                   </span>
               </span>
             </el-table-column>
-        </Ftable>
+         </Ftable>
     </div>
 </template>
 
@@ -66,6 +66,9 @@
 
             console.log(this.paramsProperties)
             let tableConfig = this.paramsProperties.map((item) => {
+                if(item.type=="point"||item.type=="polygon"||item.type=="line"){
+                    return {prop: item.code, label: item.name, event:'draw',type:item.type}
+                }
                 return {
                     prop: item.code,
                     label: item.name,
@@ -84,6 +87,7 @@
                                 return this.relationData[cell][value];
                             }
                         }
+
                         return value;
                     },
                     align: 'center'
@@ -96,6 +100,18 @@
             })
         },
         methods: {
+            handleMap1(item) {
+
+                console.log('row',item);
+                window.parent.postMessage({
+                    state: 'drapMap',
+                    data: {
+                        coordinates: item.value,
+                        type: item.type,
+                        unEdit:true
+                    }
+                }, '*');
+            },
             loadRelationData(item) {
                 this.$axios.post("/api/param/parameterManage/get?id=" + item.relateObjectId, {}).then(response => {
 

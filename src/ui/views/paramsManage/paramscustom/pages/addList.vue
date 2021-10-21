@@ -26,7 +26,9 @@
                     :value="itemc.code">
                 </el-option>
             </el-select>
-            <el-input v-model="item.value"  placeholder="请输入" v-else></el-input>
+            <el-input v-model="item.value"   :class="{resetWidth:showCoordinatesBt(item)}" placeholder="请输入" v-else></el-input>
+            <el-button @click="handleMap1(item)" v-if="showCoordinatesBt(item)">选取坐标</el-button>
+
         </el-form-item>
         <el-form-item label="">
             <el-button type="primary" @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
@@ -36,6 +38,7 @@
 
 <script>
 import requestApi from '@/api/index.js';
+ import DrawMixins from "../components/drawMixins";
 export default {
     name:'addList',
     data(){
@@ -48,6 +51,8 @@ export default {
             isEdit:false,
         }
     },
+    mixins:[DrawMixins],
+
     mounted(){
         let query=this.$route.query;
         this.parameterId=query.parameterId;
@@ -174,6 +179,9 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+/deep/ .resetWidth{
+    width:calc(100% - 105px)!important;
+    margin-right: 10px;
+}
 </style>

@@ -40,7 +40,7 @@
 import {cloneDeep} from 'lodash';
 import requestApi from '@/api/index.js';
 import {mapGetters} from "vuex"
-
+import DrawMixins from './drawMixins'
 export default {
     name: 'Object',
     props: ['paramsProperties'],
@@ -53,54 +53,13 @@ export default {
             rules: {},
         }
     },
-    computed: {
-        showCoordinatesBt() {
-            return (item) => {
-                return item.type === 'point' || item.type === 'line' || item.type === 'polygon'
-            }
-        },
-        ...mapGetters(['getGisinfo'])
-    },
-    watch: {
-        getGisinfo: {
-            handler: function () {
-                // console.log('111')
-                // console.log(this.getGisinfo)
-                let coordinates = [...this.getGisinfo.coordinates]
-                console.log('coordinates-property', coordinates)
-                let transObj = {
-                    point: "Point",
-                    line: "LineString",
-                    polygon: "Polygon",
-                }
-                this.form.properties.forEach(item => {
-                    console.log('地图数据qq', item.type);
-                    if (transObj[item.type] === this.getGisinfo.type) {
+    mixins:[DrawMixins],
 
-                        item.value = JSON.stringify(coordinates)
-                    }
-                })
-                console.log(this.form.properties)
-            },
-            deep: true
-        }
-    },
     mounted() {
         this.getObjParameterFn();
     },
     methods: {
-        handleMap1(item) {
-            console.log(item);
 
-
-            window.parent.postMessage({
-                state: 'drapMap',
-                data: {
-                    coordinates: item.value,
-                    type: item.type,
-                }
-            }, '*');
-        },
         //处理渲染数据
         handleProperties(data) {
             this.form.properties = data.map((item, i) => {

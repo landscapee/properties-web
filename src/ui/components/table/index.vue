@@ -19,6 +19,7 @@
 				</el-table-column>
 				<el-table-column v-else :show-overflow-tooltip="true" v-bind="colConfig" :key="index1 + '5'" :reserve-selection="true">
 					<span v-if="colConfig.formatter" slot-scope="{ row }"> {{colConfig.formatter(row,colConfig.prop,row[colConfig.prop])}}</span>
+					<span  v-else-if="colConfig.event" slot-scope="{ row }"  @click="eventEmit(colConfig,row[colConfig.prop])">{{row[colConfig.prop]}} </span>
 					<span v-else-if="colConfig.prop.split('.').length===3" slot-scope="{ row }">{{row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]][colConfig.prop.split('.')[2]]?row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]][colConfig.prop.split('.')[2]]:"--"}}</span>
 					<span v-else-if="colConfig.prop.split('.').length===2"  slot-scope="{ row }"> {{row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]]?row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]]:'--'}}</span>
 					<span v-else-if="colConfig.prop.split('.').length===1" slot-scope='{row}'>{{row[colConfig.prop]?row[colConfig.prop]:'--'}}</span>
@@ -146,6 +147,9 @@ export default {
 		resize() {
 	
 		},
+        eventEmit(colConfig,value){
+            this.$emit(colConfig.event, {type:colConfig.type,value,isEdit:false})
+        }
 	},
 	mounted() {
 		this.$nextTick(function() {
