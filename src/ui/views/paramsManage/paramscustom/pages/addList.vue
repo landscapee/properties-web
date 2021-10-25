@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-07-07 11:32:05
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-10 15:28:39
+ * @LastEditTime: 2021-10-25 14:28:30
 -->
 <template>
    <el-form :model="form"  ref="ruleForm" label-width="160px" class="collect_form">
@@ -130,11 +130,20 @@ export default {
                 data
             });
             if(res){
-                this.$message({
-                    type:'success',
-                    message:'保存成功'
-                });
-                this.$router.go(-1)
+                if(res===true){
+                    this.$message({
+                        type:'success',
+                        message:'保存成功'
+                    });
+                    this.$router.go(-1)
+                    
+                }else{
+                    this.$message({
+                        type:'warning',
+                        message:res
+                    });
+                }
+               
             }
         },
         async updateListParameterFn(){
@@ -152,11 +161,19 @@ export default {
                 data
             })
             if(res){
-                this.$message({
+                if(res===true){
+                    this.$message({
                     type:'success',
                     message:'保存成功'
-                })
-                this.$router.go(-1)
+                    })
+                    this.$router.go(-1)
+                }else{
+                     this.$message({
+                        type:'warning',
+                        message:res
+                    });
+                }
+                
             }
         },
          submitForm(){
