@@ -6,7 +6,7 @@ import {mapGetters} from "vuex"
 
 export default {
     name: "drawMinxs",
-     data() {
+    data() {
         return {}
     },
     computed: {
@@ -42,19 +42,28 @@ export default {
         }
     },
     methods: {
-        handleMap1(item) {
-            console.log('row1',item);
+        copyData(text, ref) {
+            let copyDOM1 = this.$refs[ref]; //指定的DOM元素
+            copyDOM1[0]&&(copyDOM1=copyDOM1[0])
+            copyDOM1.select()
+            let successful1 = document.execCommand('copy');// 执行 copy 操作
+            successful1 ? this.$message.success('复制成功')
+                : this.$message.info('复制失败');
 
+        },
+        handleMap1(item,unEdit) {
+            console.log('item',item);
             window.parent.postMessage({
                 state: 'drapMap',
                 data: {
                     coordinates: item.value,
                     type: item.type,
+                    unEdit:unEdit
                 }
             }, '*');
         },
     },
- }
+}
 </script>
 
 <style scoped>
