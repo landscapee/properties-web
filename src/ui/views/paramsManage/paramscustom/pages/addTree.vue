@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-07-08 10:57:07
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-09-08 17:29:56
+ * @LastEditTime: 2021-10-25 14:31:13
 -->
 <template>
    <el-form :model="form"  ref="ruleForm" label-width="160px" class="collect_form">
@@ -75,11 +75,19 @@ export default {
                 data
             });
             if(res){
-                this.$message({
-                    type:"success",
-                    message:'保存成功'
-                });
-                this.$router.go(-1)
+                if(res===true){
+                    this.$message({
+                        type:"success",
+                        message:'保存成功'
+                    });
+                    this.$router.go(-1)
+                }else{
+                    this.$message({
+                        type:"warning",
+                        message:res
+                    });
+                }
+                
             }
         },
         submitForm(){
