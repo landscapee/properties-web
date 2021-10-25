@@ -4,7 +4,7 @@
  * @version: 
  * @Date: 2021-06-01 14:44:39
  * @LastEditors: yang fu ren
- * @LastEditTime: 2021-10-25 14:18:35
+ * @LastEditTime: 2021-10-25 14:37:15
 -->
 <template>
     <div class="createParams">
@@ -293,14 +293,22 @@ export default {
                 data
             });
             if(res){
-                this.$message({
-                    type:"success",
-                    message:'保存成功'
-                })
-                this.$router.go(-1);
-                window.parent.postMessage({
-                   state:'success'
-                }, '*');
+                if(res===true){
+                    this.$message({
+                        type:"success",
+                        message:'保存成功'
+                    })
+                    this.$router.go(-1);
+                    window.parent.postMessage({
+                    state:'success'
+                    }, '*');
+                }else{
+                     this.$message({
+                        type:"warning",
+                        message:res
+                    })
+                }
+                
             }
         },
         async updateFn(){
@@ -322,14 +330,22 @@ export default {
                 data
             });
             if(res){
-                 this.$message({
-                    type:"success",
-                    message:'保存成功'
-                })
-                this.$router.go(-1);
-                 window.parent.postMessage({
-                   state:'success'
-                }, '*');
+                if(res===true){
+                    this.$message({
+                        type:"success",
+                        message:'保存成功'
+                    })
+                    this.$router.go(-1);
+                    window.parent.postMessage({
+                    state:'success'
+                    }, '*');
+                }else{
+                     this.$message({
+                        type:"warning",
+                        message:res
+                    })
+                }
+                
             }
         },
         changeType(){
