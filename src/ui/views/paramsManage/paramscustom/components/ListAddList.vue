@@ -8,6 +8,9 @@
 -->
 <template>
     <div class="listAddObject">
+        <!--      input  复制辅助-->
+        <input style="opacity: 0;position: absolute" ref="copyText" readonly="readonly" :value="coordinatesValue">
+
         <div class="classifyItems">
             <ul class="classifyItems_box" v-if="categoryOptions.length">
                 <li class="item" v-for="(item) in categoryOptions" :key="item.id" @click="handleClickCategory(item)"
@@ -28,7 +31,7 @@
                 </div>
             </div>
             <Ftable :data="tableData" :tableConfig="tableConfig" :offsetTop="100" @handleSizeChange="handleSizeChange"
-                    @handleCurrentChange="handleCurrentChange">
+                    @handleCurrentChange="handleCurrentChange"  @drawOrSee="drawOrSee">
                 <el-table-column v-if="editable" slot="operation" :width="150" fixed="right" label="操作" align="center">
                     <span slot-scope="{ row }" class="operation">
                         <span title="编辑" class="icon_box" @click="handleClickEdit(row)">
@@ -48,6 +51,7 @@
     import requestApi from '@/api/index.js';
     import Ftable from '@/components/table';
     import Sortable from 'sortablejs';
+    import DrawMixins from "./drawMixins";
 
     export default {
         name: 'ListAddList',
@@ -61,6 +65,8 @@
                     size: 10,
                     current: 1
                 },
+                coordinatesValue: null,
+
                 tableData: {
                     records: [],
                 },
@@ -71,6 +77,8 @@
                 relationData: {}
             }
         },
+        mixins: [DrawMixins],
+
         mounted() {
 
             this.paramsProperties.forEach((item) => {
@@ -80,6 +88,12 @@
             });
 
             let tableConfig = this.paramsProperties.map((item) => {
+                if (item.type == "point" || item.type == "polygon" || item.type == "line") {
+                    return {
+                        prop: item.code, label: item.name, event: 'drawOrSee', type: item.type,
+                        buttons: [{name: '查看', event: 'handleMap1'}, {name: '复制数据', event: 'copyData'}]
+                    }
+                }
                 return {
                     prop: item.code,
                     label: item.name,
@@ -120,7 +134,21 @@
                 immediate: true
             }
         },
+
         methods: {
+            async drawOrSee(item) {
+                // item.event 是由 this.tableConfig 赋值的
+                if (item.event == 'copyData') {
+                    this.coordinatesValue = item.value;
+                    // this.copyData 需要等待元素赋值成功
+                    await this.$nextTick()
+                    // this.copyData
+                    this[item.event](item.value, 'copyText')
+                } else {
+                    // this.handleMap1
+                    this[item.event](item, true)
+                }
+            },
             loadRelationData(item) {
                 this.$axios.post("/api/param/parameterManage/get?id=" + item.relateObjectId, {}).then(response => {
 

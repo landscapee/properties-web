@@ -26,6 +26,13 @@
                     :value="itemc.code">
                 </el-option>
             </el-select>
+            <template v-else-if="showCoordinatesBt(item)">
+                <input   :ref="'copyText'+index" readonly="readonly" class="copy-txt"  :value="item.value">
+
+                <el-button @click="handleMap1(item,true)" >查看</el-button>
+                <el-button @click="copyData(item.value,'copyText'+index)" >复制数据</el-button>
+                <el-button @click="handleMap1(item)" v-if="showCoordinatesBt(item)">选取坐标</el-button>
+            </template>
             <el-input v-model="item.value"  placeholder="请输入" v-else></el-input>
             <el-button @click="handleMap" v-if="item.type==='gismap'">选取坐标</el-button>
         </el-form-item>
@@ -39,6 +46,7 @@
 import requestApi from '@/api/index.js';
 import {mapGetters} from "vuex"
 import { constants, copyFileSync } from 'fs';
+import DrawMixins from "../components/drawMixins";
 export default {
     name:'addList',
     data(){
@@ -56,6 +64,8 @@ export default {
             },
         }
     },
+    mixins:[DrawMixins],
+
     computed:{
         ...mapGetters(['getGisinfo'])
     },
@@ -223,6 +233,18 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped lang="scss">
+.copy-txt:hover{
+    cursor: default!important;
+}
+.copy-txt{
+    width: calc(100% - 280px);
+    opacity: 1;
+    border: 1px #DCDFE6 solid;
+    height: 40px;
+    border-radius: 4px;
+}
+.copy-txt:focus{
+    outline: none;
+}
 </style>
