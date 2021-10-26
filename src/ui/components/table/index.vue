@@ -17,11 +17,11 @@
 				</el-table-column>
 				<el-table-column v-else-if="colConfig.type==='selection'" :reserve-selection="true" :show-overflow-tooltip="true" v-bind="colConfig" :key="index1 + '4'">
 				</el-table-column>
-				<el-table-column v-else :show-overflow-tooltip="true" v-bind="colConfig" :key="index1 + '5'" :reserve-selection="true">
+				<el-table-column v-else :show-overflow-tooltip="true"  v-bind="colConfig" :key="index1 + '5'" :reserve-selection="true">
 					<span v-if="colConfig.formatter" slot-scope="{ row }"> {{colConfig.formatter(row,colConfig.prop,row[colConfig.prop])}}</span>
 					<span  v-else-if="colConfig.buttons" slot-scope="{ row }"  >
                         <template v-for="btnItem in colConfig.buttons">
-                            <el-button @click="eventEmit(colConfig,row[colConfig.prop],btnItem.event)">{{btnItem.name}}</el-button>
+                            <el-button @click="eventEmit(colConfig,row[colConfig.prop],btnItem.event)" size="mini"  >{{btnItem.name}}</el-button>
                         </template>
                     </span>
 					<span v-else-if="colConfig.prop.split('.').length===3" slot-scope="{ row }">{{row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]][colConfig.prop.split('.')[2]]?row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]][colConfig.prop.split('.')[2]]:"--"}}</span>
