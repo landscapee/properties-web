@@ -74,7 +74,7 @@ export default {
         let tableConfig = this.paramsProperties.map((item) => {
             if (item.type == "point" || item.type == "polygon" || item.type == "line") {
                 return {
-                    prop: item.code, label: item.name, event: 'drawOrSee', type: item.type,
+                    prop: item.code,minWidth:'95px',  label: item.name, event: 'drawOrSee', type: item.type,
                     buttons: [{name: '查看', event: 'handleMap1'}, {name: '复制数据', event: 'copyData'}]
                 }
             }
