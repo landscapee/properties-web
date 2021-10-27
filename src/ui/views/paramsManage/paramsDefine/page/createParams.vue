@@ -96,6 +96,9 @@
                 <el-form-item label="允许编辑">
                     <el-checkbox v-model="form.editable" ></el-checkbox>
                 </el-form-item>
+                <el-form-item label="允许排序">
+                    <el-checkbox v-model="form.sortable" ></el-checkbox>
+                </el-form-item>
                 <el-form-item label="参数描述">
                     <el-input v-model="form.comment"  placeholder="请输入参数描述" type="textarea"></el-input>
                 </el-form-item>
@@ -186,6 +189,7 @@ export default {
                 comment:'',
                 parentId:'',
                 editable:true,
+                sortable:true,
             },
             fileList:[],
              rules:{
@@ -226,6 +230,7 @@ export default {
                     properties2:JSON.parse(data.properties)[0].type,
                     parentId:data.parentId||'',
                     editable:data.editable,
+                    sortable:data.sortable,
                 })
             }else{
                  this.form=Object.assign({},this.form,{
@@ -237,9 +242,9 @@ export default {
                     properties:JSON.parse(data.properties),
                     parentId:data.parentId||'',
                      editable:data.editable,
+                     sortable:data.sortable,
                 })
                 console.log(this.form.type)
-               
             }
            
        }else{

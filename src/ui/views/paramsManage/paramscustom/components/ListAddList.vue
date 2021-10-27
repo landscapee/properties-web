@@ -56,7 +56,7 @@
     export default {
         name: 'ListAddList',
         components: {Ftable},
-        props: ['parentId', 'editable', 'paramsProperties'],
+        props: ['parentId', 'editable','sortable', 'paramsProperties'],
         data() {
             return {
                 categoryId: '',
@@ -273,22 +273,24 @@
                 }
             },
             rowDropTable() {
-                const ele = document.querySelector('.el-table__body-wrapper tbody');
-                const _this = this;
-                Sortable.create(ele, {
-                    onEnd({newIndex, oldIndex}) {
-                        let id = _this.tableData[oldIndex].id;
-                        let targetId = _this.tableData[newIndex].id;
-                        let position = oldIndex > newIndex ? 'before' : 'after';
-                        let oldRow = _this.tableData[newIndex];
-                        console.log(oldRow);
-                        const currRow = _this.tableData.splice(oldIndex, 1)[0];
-                        console.log(currRow)
+                if (this.editable && this.sortable) {
+                    const ele = document.querySelector('.el-table__body-wrapper tbody');
+                    const _this = this;
+                    Sortable.create(ele, {
+                        onEnd({newIndex, oldIndex}) {
+                            let id = _this.tableData[oldIndex].id;
+                            let targetId = _this.tableData[newIndex].id;
+                            let position = oldIndex > newIndex ? 'before' : 'after';
+                            let oldRow = _this.tableData[newIndex];
+                            console.log(oldRow);
+                            const currRow = _this.tableData.splice(oldIndex, 1)[0];
+                            console.log(currRow)
 
-                        _this.tableData.splice(newIndex, 0, currRow);
-                        _this.moveListParameterFn(currRow.id, oldRow.position)
-                    },
-                });
+                            _this.tableData.splice(newIndex, 0, currRow);
+                            _this.moveListParameterFn(currRow.id, oldRow.position)
+                        },
+                    });
+                }
             },
             handleClickCategory(item) {
                 this.categoryId = item.id;

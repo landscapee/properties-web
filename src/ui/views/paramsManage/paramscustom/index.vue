@@ -12,9 +12,9 @@
             <SingleValue v-if="paramsType==='TEXT'" :paramsProperties='form.properties' :key="paramsId"></SingleValue>
             <Object v-if="paramsType==='OBJECT'" :paramsProperties='form.properties' :key="paramsId"></Object>
       </div>
-      <List v-if="paramsType==='LIST'" :paramsProperties='form.properties' :editable="form.editable" :key="paramsId"></List>
+      <List v-if="paramsType==='LIST'" :paramsProperties='form.properties' :editable="form.editable" :sortable="form.sortable" :key="paramsId"></List>
       <ListAddObject v-if="paramsType==='SUB_OBJECT'" :parentId='parentId' :paramsProperties='form.properties' :key="paramsId"></ListAddObject>
-      <ListAddList  v-if="paramsType==='SUB_LIST'"  :parentId='parentId' :paramsProperties='form.properties' :editable="form.editable" :key="paramsId"></ListAddList>
+      <ListAddList  v-if="paramsType==='SUB_LIST'"  :parentId='parentId' :paramsProperties='form.properties' :editable="form.editable" :sortable="form.sortable" :key="paramsId"></ListAddList>
       <TreeObject  v-if="paramsType==='TREE'" :parentId='parentId' :paramsProperties='form.properties' :key="paramsId"></TreeObject>
       <TreeList  v-if="paramsType==='TREE_LIST'" :parentId='parentId' :paramsProperties='form.properties' :key="paramsId"></TreeList>
     </div>
@@ -35,7 +35,8 @@ export default {
     return {
         form:{
             properties:[],
-            editable:true
+            editable:true,
+            sortable:true
         },
         rules:{},
         paramsType:'',
@@ -75,6 +76,7 @@ export default {
              this.paramsType=res.type;
              this.form.properties=JSON.parse(res.properties);
              this.form.editable=res.editable;
+             this.form.sortable=res.sortable;
              this.parentId=res.parentId||'';
              this.paramsId=this.$route.query.id
          }
