@@ -33,8 +33,8 @@
             <Ftable :data="tableData" :tableConfig="tableConfig" :offsetTop="100" @handleSizeChange="handleSizeChange"
                     @handleCurrentChange="handleCurrentChange"  @drawOrSee="drawOrSee">
                 <el-table-column v-if="editable" slot="operation" :width="150" fixed="right" label="操作" align="center">
-                    <span slot-scope="{ row }" class="operation">
-                        <span title="编辑" class="icon_box" @click="handleClickEdit(row)">
+                    <span slot-scope="{ row ,$index}" class="operation">
+                        <span title="编辑" class="icon_box" @click="handleClickEdit(row,$index)">
                             <icon-svg icon-class="table_edit" class="logo"></icon-svg>
                         </span>
                         <span title="删除" class="icon_box" @click="handleClickDelete(row)">
@@ -320,10 +320,11 @@
                     });
                 });
             },
-            handleClickEdit(row) {
+            handleClickEdit(row,index) {
                 this.$router.push({
                     path: 'addListAddList',
                     query: {
+                        index,
                         isEdit: true,
                         parameterId: this.$route.query.id,
                         parentDataId: this.categoryId, ...row,
