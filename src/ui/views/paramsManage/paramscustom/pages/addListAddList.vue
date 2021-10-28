@@ -101,6 +101,27 @@ export default {
        
     },
     methods:{
+        getClassifyData(index, code,type) {
+            return this.$axios.post("/api/param/parameter-list/get", {
+                parameterId: this.parameterId,
+                parentDataId: this.parentDataId,
+            }).then(res => {
+                let data = res.data.data
+                data.splice(index, 1)
+                let arr = []
+                data.length&&data.map((item) => {
+                    let itemValue= JSON.parse(item.value);
+                    let coordinates
+                    try {
+                        coordinates = JSON.parse(itemValue[code]);
+                    } catch (e) {
+                        coordinates = null
+                    }
+                    coordinates&&arr.push({coordinates, type,id:this.$uuid()})
+                });
+                return arr
+            });
+        },
         handleMapData(data){
             console.log(data);
             console.log(this.form)

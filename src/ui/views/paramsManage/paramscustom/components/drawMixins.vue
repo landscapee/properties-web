@@ -51,27 +51,7 @@ export default {
                 : this.$message.info('复制失败');
 
         },
-        getClassifyData(index, code,type) {
-            return this.$axios.post("/api/param/parameter-list/get", {
-                parameterId: this.parameterId,
-                parentDataId: this.parentDataId,
-            }).then(res => {
-                let data = res.data.data
-                data.splice(index, 1)
-                let arr = []
-                data.length&&data.map((item) => {
-                    let itemValue= JSON.parse(item.value);
-                    let coordinates
-                    try {
-                        coordinates = JSON.parse(itemValue[code]);
-                    } catch (e) {
-                        coordinates = null
-                    }
-                    coordinates&&arr.push({coordinates, type,id:this.$uuid()})
-                });
-                return arr
-            });
-        },
+
         async handleMap1(item, unEdit) {
              let classifyData=null
             if (item.type == 'line' || item.type == 'polygon') {

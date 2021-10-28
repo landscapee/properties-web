@@ -152,7 +152,7 @@ export default {
 	
 		},
         eventEmit(colConfig,value,btnEvent){
-            this.$emit(colConfig.event, {type:colConfig.type,value,event:btnEvent})
+            this.$emit(colConfig.event, {type:colConfig.type,code:colConfig.prop,value,event:btnEvent})
         }
 	},
 	mounted() {

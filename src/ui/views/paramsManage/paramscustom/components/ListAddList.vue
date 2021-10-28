@@ -146,8 +146,26 @@
                     this[item.event](item.value, 'copyText')
                 } else {
                     // this.handleMap1
+                    console.log(item,'table');
                     this[item.event](item, true)
                 }
+            },
+            getClassifyData(index, code,type) {
+                let data = [...this.tableData]
+                data.splice(index, 1)
+                let arr = []
+                data.length&&data.map((item) => {
+                      let coordinates
+                    console.log(item[code],item,code);
+                    try {
+                        coordinates = JSON.parse(item[code]);
+                    } catch (e) {
+                        coordinates = null
+                    }
+                    coordinates&&arr.push({coordinates, type,id:this.$uuid()})
+                });
+                console.log(arr);
+                return arr
             },
             loadRelationData(item) {
                 this.$axios.post("/api/param/parameterManage/get?id=" + item.relateObjectId, {}).then(response => {
