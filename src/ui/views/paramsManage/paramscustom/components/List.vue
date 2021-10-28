@@ -40,7 +40,7 @@ import DrawMixins from './drawMixins'
 export default {
     name: 'List',
     components: {Ftable},
-    props: ['editable', 'paramsProperties'],
+    props: ['editable','sortable', 'paramsProperties'],
     data() {
         return {
             key: '',
@@ -196,7 +196,7 @@ export default {
             }
         },
         rowDropTable() {
-            if (this.editable) {
+            if (this.editable && this.sortable) {
                 const ele = document.querySelector('.el-table__body-wrapper tbody');
                 const _this = this;
                 Sortable.create(ele, {
