@@ -29,9 +29,9 @@
             <template v-else-if="showCoordinatesBt(item)">
                 <input   :ref="'copyText'+index" readonly="readonly" class="copy-txt"  :value="item.value">
 
-                <el-button @click="handleMap1(item,true)" >查看</el-button>
+                <el-button @click="handleMap1({...item,ChildrenList:true},true)" >查看</el-button>
                 <el-button @click="copyData(item.value,'copyText'+index)" >复制数据</el-button>
-                <el-button @click="handleMap1(item)" v-if="showCoordinatesBt(item)">选取坐标</el-button>
+                <el-button @click="handleMap1({...item,ChildrenList:true})" v-if="showCoordinatesBt(item)">选取坐标</el-button>
             </template>
             <el-input v-model="item.value"  placeholder="请输入" v-else></el-input>
             <el-button @click="handleMap" v-if="item.type==='gismap'">选取坐标</el-button>

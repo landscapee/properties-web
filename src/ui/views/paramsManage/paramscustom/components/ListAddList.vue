@@ -147,7 +147,7 @@
                 } else {
                     // this.handleMap1
                     console.log(item,'table');
-                    this[item.event](item, true)
+                    this[item.event]({...item,ChildrenList:true}, true)
                 }
             },
             getClassifyData(index, code,type) {
