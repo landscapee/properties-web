@@ -106,6 +106,8 @@ export default {
                 parameterId: this.parameterId,
                 parentDataId: this.parentDataId,
             }).then(res => {
+                console.log(index, code, type,res);
+
                 let data = res.data.data
                 data.splice(index, 1)
                 let arr = []

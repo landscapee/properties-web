@@ -18,16 +18,19 @@
 				<el-table-column v-else-if="colConfig.type==='selection'" :reserve-selection="true" :show-overflow-tooltip="true" v-bind="colConfig" :key="index1 + '4'">
 				</el-table-column>
 				<el-table-column v-else :show-overflow-tooltip="true"  v-bind="colConfig" :key="index1 + '5'" :reserve-selection="true">
-					<span v-if="colConfig.formatter" slot-scope="{ row }"> {{colConfig.formatter(row,colConfig.prop,row[colConfig.prop])}}</span>
-					<span  v-else-if="colConfig.buttons" slot-scope="{ row }"  >
+				    <template slot-scope="{row,$index}">
+                        <span v-if="colConfig.formatter"  > {{colConfig.formatter(row,colConfig.prop,row[colConfig.prop])}}</span>
+                        <span  v-else-if="colConfig.buttons"    >
                         <template v-for="btnItem in colConfig.buttons">
-                            <el-button @click="eventEmit(colConfig,row[colConfig.prop],btnItem.event)" size="mini"  >{{btnItem.name}}</el-button>
+                            <el-button @click="eventEmit(colConfig,row[colConfig.prop],btnItem.event,$index)" size="mini"  >{{btnItem.name}}</el-button>
                         </template>
                     </span>
-					<span v-else-if="colConfig.prop.split('.').length===3" slot-scope="{ row }">{{row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]][colConfig.prop.split('.')[2]]?row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]][colConfig.prop.split('.')[2]]:"--"}}</span>
-					<span v-else-if="colConfig.prop.split('.').length===2"  slot-scope="{ row }"> {{row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]]?row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]]:'--'}}</span>
-					<span v-else-if="colConfig.prop.split('.').length===1" slot-scope='{row}'>{{row[colConfig.prop]?row[colConfig.prop]:'--'}}</span>
-				</el-table-column>
+                        <span v-else-if="colConfig.prop.split('.').length===3"  >{{row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]][colConfig.prop.split('.')[2]]?row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]][colConfig.prop.split('.')[2]]:"--"}}</span>
+                        <span v-else-if="colConfig.prop.split('.').length===2"   > {{row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]]?row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]]:'--'}}</span>
+                        <span v-else-if="colConfig.prop.split('.').length===1"  >{{row[colConfig.prop]?row[colConfig.prop]:'--'}}</span>
+
+                    </template>
+                </el-table-column>
 			</template>
 		</el-table>
 		<!--总条数大于21调才显示翻页-->
@@ -151,8 +154,8 @@ export default {
 		resize() {
 	
 		},
-        eventEmit(colConfig,value,btnEvent){
-            this.$emit(colConfig.event, {type:colConfig.type,code:colConfig.prop,value,event:btnEvent})
+        eventEmit(colConfig,value,btnEvent,index){
+            this.$emit(colConfig.event, {type:colConfig.type,code:colConfig.prop,value,event:btnEvent,index})
         }
 	},
 	mounted() {

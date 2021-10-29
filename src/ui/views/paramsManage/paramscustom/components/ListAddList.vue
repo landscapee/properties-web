@@ -342,6 +342,7 @@
                 });
             },
             handleClickEdit(row,index) {
+                console.log('index',index);
                 this.$router.push({
                     path: 'addListAddList',
                     query: {
