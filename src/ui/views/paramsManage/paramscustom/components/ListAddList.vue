@@ -151,12 +151,13 @@
                 }
             },
             getClassifyData(index, code,type) {
+                console.log(index, code, type);
                 let data = [...this.tableData]
                 data.splice(index, 1)
                 let arr = []
                 data.length&&data.map((item) => {
                       let coordinates
-                    console.log(item[code],item,code);
+                    // console.log(item[code],item,code);
                     try {
                         coordinates = JSON.parse(item[code]);
                     } catch (e) {
