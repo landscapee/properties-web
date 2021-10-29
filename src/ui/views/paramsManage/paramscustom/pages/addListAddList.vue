@@ -27,7 +27,7 @@
                 </el-option>
             </el-select>
             <template v-else-if="showCoordinatesBt(item)">
-                <input   :ref="'copyText'+index"  class="copy-txt"  :value="item.value">
+                <input   v-model="item.value"  :ref="'copyText'+index"  class="copy-txt"  >
 <!--                readonly="readonly"-->
                 <el-button @click="handleMap1({...item,index:rowIndex,ChildrenList:true},true)" >查看</el-button>
                 <el-button @click="copyData(item.value,'copyText'+index)" >复制数据</el-button>
