@@ -29,9 +29,9 @@
             <template v-else-if="showCoordinatesBt(item)">
                 <input   :ref="'copyText'+index"  class="copy-txt"  :value="item.value">
 <!--                readonly="readonly"-->
-                <el-button @click="handleMap1({...item,ChildrenList:true},true)" >查看</el-button>
+                <el-button @click="handleMap1({...item,index:rowIndex,ChildrenList:true},true)" >查看</el-button>
                 <el-button @click="copyData(item.value,'copyText'+index)" >复制数据</el-button>
-                <el-button @click="handleMap1({...item,ChildrenList:true})" v-if="showCoordinatesBt(item)">选取坐标</el-button>
+                <el-button @click="handleMap1({...item,index:rowIndex,ChildrenList:true})" v-if="showCoordinatesBt(item)">选取坐标</el-button>
             </template>
             <el-input v-model="item.value"  placeholder="请输入" v-else></el-input>
             <el-button @click="handleMap" v-if="item.type==='gismap'">选取坐标</el-button>
@@ -54,6 +54,7 @@ export default {
             form:{
                 properties:[],
             },
+            rowIndex:null,
             parameterId:'',
             parentDataId:'',
             id:'',
@@ -72,28 +73,24 @@ export default {
     watch:{
         getGisinfo:{
             handler:function(){
-                console.log('111')
-                console.log(this.form)
-                console.log(this.getGisinfo)
                 let coordinates=[...this.getGisinfo.coordinates]
-                console.log(coordinates)
                 this.form.properties.forEach(item=>{
                     if(item.type==='gismap'){
                         console.log('地图数据');
                         item.value=JSON.stringify(coordinates)
                     }
                 })
-                console.log(this.form.properties)
             },
             deep:true
         }
     },
     mounted(){
-        console.log(this.getGisinfo)
         let query=this.$route.query;
         this.parameterId=query.parameterId;
         this.parentDataId=query.parentDataId;
         this.isEdit=query.isEdit;
+        console.log('query',query);
+        this.rowIndex=query.index;
         this.handleProperties(query)
         if(this.isEdit){
             this.id=query.id;
