@@ -21,10 +21,10 @@
 				    <template slot-scope="{row,$index}">
                         <span v-if="colConfig.formatter"  > {{colConfig.formatter(row,colConfig.prop,row[colConfig.prop])}}</span>
                         <span  v-else-if="colConfig.buttons"    >
-                        <template v-for="btnItem in colConfig.buttons">
-                            <el-button @click="eventEmit(colConfig,row[colConfig.prop],btnItem.event,$index)" size="mini"  >{{btnItem.name}}</el-button>
-                        </template>
-                    </span>
+                            <template v-for="btnItem in colConfig.buttons">
+                                <el-button @click="eventEmit(colConfig,row[colConfig.prop],btnItem.event,$index)" size="mini"  >{{btnItem.name}}</el-button>
+                            </template>
+                        </span>
                         <span v-else-if="colConfig.prop.split('.').length===3"  >{{row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]][colConfig.prop.split('.')[2]]?row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]][colConfig.prop.split('.')[2]]:"--"}}</span>
                         <span v-else-if="colConfig.prop.split('.').length===2"   > {{row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]]?row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]]:'--'}}</span>
                         <span v-else-if="colConfig.prop.split('.').length===1"  >{{row[colConfig.prop]?row[colConfig.prop]:'--'}}</span>
