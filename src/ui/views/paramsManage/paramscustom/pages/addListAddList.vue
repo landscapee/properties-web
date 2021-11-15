@@ -29,9 +29,9 @@
             <template v-else-if="showCoordinatesBt(item)">
                 <input   v-model="item.value"  :ref="'copyText'+index"  class="copy-txt"  >
 <!--                readonly="readonly"-->
-                <el-button @click="handleMap1({...item,index:rowIndex,ChildrenList:true},true)" >查看</el-button>
+                <el-button @click="handleMap1({...item,id,ChildrenList:true},true)" >查看</el-button>
                 <el-button @click="copyData(item.value,'copyText'+index)" >复制数据</el-button>
-                <el-button @click="handleMap1({...item,index:rowIndex,ChildrenList:true})" v-if="showCoordinatesBt(item)">选取坐标</el-button>
+                <el-button @click="handleMap1({...item,id,ChildrenList:true})" v-if="showCoordinatesBt(item)">选取坐标</el-button>
             </template>
             <el-input v-model="item.value"  placeholder="请输入" v-else></el-input>
             <el-button @click="handleMap" v-if="item.type==='gismap'">选取坐标</el-button>
@@ -98,14 +98,15 @@ export default {
        
     },
     methods:{
-        getClassifyData(index, code,type) {
+        getClassifyData(id, code,type) {
             return this.$axios.post("/api/param/parameter-list/get", {
                 parameterId: this.parameterId,
                 parentDataId: this.parentDataId,
             }).then(res => {
-                console.log(index, code, type,res);
-
                 let data = res.data.data
+                let index = data.findIndex((d) => d.id === id)
+                console.log(id,index, code, type,res);
+
                 data.splice(index, 1)
                 let arr = []
                 data.length&&data.map((item) => {

@@ -61,7 +61,7 @@ export default {
                     line: "LineString",
                     polygon: "Polygon",
                 }
-                classifyData=await this.getClassifyData(item.index, item.code,transObj[item.type])
+                classifyData=await this.getClassifyData(item.id, item.code,transObj[item.type])
             }
             let data = {
                 coordinates: item.value,
