@@ -55,7 +55,7 @@ export default {
         async handleMap1(item, unEdit) {
             console.log('item',item);
             let classifyData=null
-            if (item.type == 'line' || item.type == 'polygon'&&item.ChildrenList) {
+            if ((item.type == 'line' || item.type == 'polygon')&&item.ChildrenList) {
                 let transObj = {
                     point: "Point",
                     line: "LineString",

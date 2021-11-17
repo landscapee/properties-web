@@ -30,7 +30,7 @@ module.exports = merge(common, {
         proxy: { // 代理
             "/api/param":{
                 // target: "http://173.101.3.112:6066",
-                target: "http://173.100.1.154:18080", //邛崃测试,
+                target: "http://173.100.1.154:18081", //邛崃测试,
                 pathRewrite: {
                     '^/api/param': ''
                 }
