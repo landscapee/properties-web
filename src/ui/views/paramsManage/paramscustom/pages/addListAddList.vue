@@ -117,7 +117,8 @@ export default {
                     } catch (e) {
                         coordinates = null
                     }
-                    coordinates&&arr.push({coordinates, type,id:this.$uuid()})
+                // ,id:this.$uuid()
+                    coordinates&&arr.push({coordinates, type})
                 });
                 return arr
             });
