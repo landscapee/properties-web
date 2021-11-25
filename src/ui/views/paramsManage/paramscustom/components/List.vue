@@ -9,16 +9,19 @@
 <template>
     <div style="height:100%;width:100%">
         <!--      input  复制辅助-->
-        <input style="opacity: 0;position: absolute" ref="copyText" readonly="readonly" :value="coordinatesValue">
-        <div v-if="editable" class="title_box">
-            <div style="margin-left: auto;">
+        <input style="opacity: 0;width:10px;position: absolute" ref="copyText" readonly="readonly" :value="coordinatesValue">
+        <div v-if="editable" class="title_boxNew">
+            <div class="item">
+
+                <el-input v-model="text" @keyup.enter.native="searchChange"></el-input>
+                <el-button type="primary" size="mini" @click="handleSearch" icon="el-icon-search">搜索</el-button>
                 <el-button class="add_btn" type="primary" @click="handleAdd">添加</el-button>
             </div>
         </div>
-        <Ftable :data="tableData" :tableConfig="tableConfig" :offsetTop="47" @handleCurrentChange="handleCurrentChange"
+        <Ftable ref="table" :data="tableData" :tableConfig="tableConfig" :offsetTop="47" @handleCurrentChange="handleCurrentChange"
                 @drawOrSee="drawOrSee">
             <el-table-column v-if="editable" slot="operation" :width="150" fixed="right" label="操作" align="center">
-              <span slot-scope="{ row }" class="operation">
+              <span slot-scope="{ row }" class="operation"  v-if="!row._showinput_">
                    <span title="编辑" class="icon_box" @click="handleClickEdit(row)">
                     <icon-svg icon-class="table_edit" class="logo"></icon-svg>
                   </span>
@@ -44,6 +47,7 @@ export default {
     data() {
         return {
             key: '',
+            text: '',
             params: {
                 size: 10,
                 current: 1
@@ -74,13 +78,16 @@ export default {
         let tableConfig = this.paramsProperties.map((item) => {
             if (item.type == "point" || item.type == "polygon" || item.type == "line") {
                 return {
-                    prop: item.code,minWidth:'95px',  label: item.name, event: 'drawOrSee', type: item.type,
+                    prop: item.code,minWidth:'95px',  label: item.name,
+                    contrastLayer:item.contrastLayer,contrastLayerAtr:item.contrastLayerAtr,
+                    event: 'drawOrSee', type: item.type, align: 'center',
                     buttons: [{name: '查看', event: 'handleMap1'}, {name: '复制数据', event: 'copyData'}]
                 }
             }
             return {
                 prop: item.code,
                 label: item.name,
+                type:item.type,
                 formatter: (row, cell, value) => {
                     if (this.relationData[cell]) {
                         if (Array.isArray(value)) {
@@ -96,7 +103,6 @@ export default {
                             return this.relationData[cell][value];
                         }
                     }
-
                     return value;
                 },
                 align: 'center'
@@ -109,6 +115,13 @@ export default {
         })
     },
     methods: {
+        searchChange(){
+            console.log(1121);
+            this.$refs.table.searchData('fuzzy',this.text)
+        },
+        handleSearch(){
+            this.$refs.table.showForm()
+        },
         async drawOrSee(item) {
             // item.event 是由 this.tableConfig 赋值的
             if (item.event == 'copyData') {

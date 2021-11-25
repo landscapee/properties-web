@@ -141,6 +141,7 @@ export default {
                     this.getListParameterDeFn(item.relateObjectId,i)
                 }
                return {
+                    ...item,
                     code: item.code,
                     isText: item.isText,
                     isValue: item.isValue,

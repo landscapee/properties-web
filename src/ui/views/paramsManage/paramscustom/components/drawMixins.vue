@@ -54,7 +54,8 @@ export default {
 
         async handleMap1(item, unEdit) {
             console.log('item',item);
-            let classifyData=null
+            let classifyData=[]
+            let contrastLayerData=[]
             if ((item.type == 'line' || item.type == 'polygon')&&item.ChildrenList) {
                 let transObj = {
                     point: "Point",
@@ -63,17 +64,49 @@ export default {
                 }
                 classifyData=await this.getClassifyData(item.id, item.code,transObj[item.type])
             }
+            if(item.contrastLayer&&item.contrastLayerAtr){
+                contrastLayerData= await this.getContrastLayerData(item)
+            }
+
+            console.log(classifyData,contrastLayerData);
             let data = {
                 coordinates: item.value,
                 type: item.type,
                 unEdit: unEdit,
-                classifyData
+                classifyData:[...classifyData,...contrastLayerData]
             }
             window.parent.postMessage({
                 state: 'drapMap',
                 data,
             }, '*');
         },
+        getContrastLayerData(item){
+            return this.$axios.post("/api/param/parameter-list/get", {
+                parameterId: item.contrastLayer,
+            }).then(res => {
+                let data = res.data.data
+                console.log(1241,data);
+                let [code,type]=item.contrastLayerAtr.split('$_$')
+                let arr = []
+                data.length&&data.map((item) => {
+                    let itemValue= JSON.parse(item.value);
+                    let coordinates
+                    try {
+                        coordinates = JSON.parse(itemValue[code]);
+                    } catch (e) {
+                        coordinates = null
+                    }
+                    let transObj = {
+                        point: "Point",
+                        line: "LineString",
+                        polygon: "Polygon",
+                    }
+                    coordinates&&Array.isArray(coordinates)&&arr.push({coordinates, type:transObj[type]})
+                });
+                return arr
+            });
+        },
+
     },
 }
 </script>

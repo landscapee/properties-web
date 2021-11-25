@@ -85,20 +85,19 @@
 			float: right;
 		}
   }
-  // div class="title_box">
-	// 		<span class="title_text"></span>
-	// 		<el-form :inline="true" :inline-message="true" class="resetFormSearch">
-	// 			<el-form-item label="单元名称" :inline-message="true" clearable>
-	// 				<el-input maxlength="50" clearable @input="getList1" type="text" v-model="form.name" placeholder="请输入"></el-input>
-	// 			</el-form-item>
-	// 			<el-form-item label="单元编号" :inline-message="true" clearable>
-	// 				<el-input maxlength="50" @input="getList1" clearable type="text" v-model="form.code" placeholder="请输入"></el-input>
-	// 			</el-form-item>
-	// 			<el-form-item label="部门" :inline-message="true">
-	// 				<el-select size="mini" @change="getList1" v-model="form.deptId" clearable placeholder="请选择">
-	// 					<el-option v-for="item in deptData" :key="item.deptId" :label="item.name" :value="item.deptId"></el-option>
-	// 				</el-select>
-	// 			</el-form-item>
-	// 			<el-button class="add_btn" icon="el-icon-circle-plus" style="float:right" @click="handleAddClick()">新增</el-button>
-	// 		</el-form>
-	// 	</div>
+  .title_boxNew{
+      position: relative;
+      height: 40px;
+    overflow: auto;
+    z-index: 1000;
+    .item{
+      position: absolute;
+      right: 0;
+    }
+    .el-input{
+      width: 180px;
+    }
+    .el-button{
+
+    }
+  }

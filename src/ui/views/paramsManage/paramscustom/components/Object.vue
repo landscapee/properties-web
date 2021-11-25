@@ -37,6 +37,7 @@
 
 
         </el-form-item>
+
         <el-form-item label="">
             <el-button type="primary" @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
         </el-form-item>
@@ -72,14 +73,9 @@ export default {
             this.form.properties = data.map((item, i) => {
                 //当参数配置有relateObjectId时要获取对应的管理数据
                 return {
-                    code: item.code,
-                    isText: item.isText,
-                    isValue: item.isValue,
-                    name: item.name,
+                    ...item,
                     objectList: [],
                     relateObjectId: item.relateObjectId ? item.relateObjectId : '',
-                    type: item.type,
-                    isRequired: item.isRequired,
                     value: '',
                 }
             });
@@ -91,7 +87,7 @@ export default {
                 data: {parameterId: this.$route.query.id}
             });
             if (res) {
-                console.log(res)
+                console.log(111,22,res)
 
                 if (res.code === 200) { //说明还没有绑定值
                     this.handleProperties(this.paramsProperties)
@@ -102,6 +98,7 @@ export default {
                     this.form.id = res.id;
                     this.form.properties = this.paramsProperties.map(item => {
                         return {
+                             ...item,
                             code: item.code,
                             isText: item.isText,
                             isValue: item.isValue,

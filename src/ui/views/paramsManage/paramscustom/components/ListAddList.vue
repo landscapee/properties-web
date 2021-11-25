@@ -23,17 +23,18 @@
             <div style="text-align:center" v-else>暂无数据</div>
         </div>
         <div class="classify_info">
-            <div v-if="editable" class="title_box">
-                <div style="margin-left: auto;">
-                    <el-button class="add_btn" @click="handleAdd" type="primary" icon="el-icon-circle-plus"
-                               v-if="categoryOptions.length">添加
-                    </el-button>
+            <div v-if="editable" class="title_boxNew">
+                <div class="item">
+
+                    <el-input v-model="text" @keyup.enter.native="searchChange"></el-input>
+                    <el-button type="primary" size="mini" @click="handleSearch" icon="el-icon-search">搜索</el-button>
+                    <el-button class="add_btn" type="primary" @click="handleAdd">添加</el-button>
                 </div>
             </div>
-            <Ftable :data="tableData" :tableConfig="tableConfig" :offsetTop="100" @handleSizeChange="handleSizeChange"
+            <Ftable ref="table" :data="tableData" :tableConfig="tableConfig" :offsetTop="100" @handleSizeChange="handleSizeChange"
                     @handleCurrentChange="handleCurrentChange"  @drawOrSee="drawOrSee">
                 <el-table-column v-if="editable" slot="operation" :width="150" fixed="right" label="操作" align="center">
-                    <span slot-scope="{ row ,$index}" class="operation">
+                    <span slot-scope="{ row ,$index}" class="operation" v-if="!row._showinput_">
                         <span title="编辑" class="icon_box" @click="handleClickEdit(row,$index)">
                             <icon-svg icon-class="table_edit" class="logo"></icon-svg>
                         </span>
@@ -59,6 +60,7 @@
         props: ['parentId', 'editable','sortable', 'paramsProperties'],
         data() {
             return {
+                text:'',
                 categoryId: '',
                 categoryOptions: [],
                 params: {
@@ -91,6 +93,7 @@
                 if (item.type == "point" || item.type == "polygon" || item.type == "line") {
                     return {
                         prop: item.code,minWidth:'95px', label: item.name, event: 'drawOrSee', type: item.type,
+                        contrastLayer:item.contrastLayer,contrastLayerAtr:item.contrastLayerAtr,
                         buttons: [{name: '查看', event: 'handleMap1'}, {name: '复制数据', event: 'copyData'}]
                     }
                 }
@@ -136,6 +139,13 @@
         },
 
         methods: {
+            searchChange(){
+                console.log(1121);
+                this.$refs.table.searchData('fuzzy',this.text)
+            },
+            handleSearch(){
+                this.$refs.table.showForm()
+            },
             async drawOrSee(item) {
                 // item.event 是由 this.tableConfig 赋值的
                 if (item.event == 'copyData') {
@@ -163,7 +173,7 @@
                     } catch (e) {
                         coordinates = null
                     }
-                    coordinates&&arr.push({coordinates, type,id:this.$uuid()})
+                    coordinates&&arr.push({coordinates, type })
                 });
                 console.log(arr);
                 return arr

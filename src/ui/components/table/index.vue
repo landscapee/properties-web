@@ -1,15 +1,15 @@
 <template>
 	<div class="fTableWrapper searchTableWrapper" ref="fTableWrapper" :style="{height:fTableWrapperHeight}">
-		<el-table :data="data instanceof Array ? data : data.records||[]" ref="table" class="mainTable" :height="tableHeight"  :row-key="getRowKeys" @setCurrentRow="setCurrentRow" @current-change="currentRowChange" highlight-current-row @row-click="checkRow" @selection-change="handleSelectionChange" @select="selectCheckBox" @select-all="selectAllCheckBox" :header-row-class-name="tableheaderRowClassName" tooltip-effect="dark" :row-class-name="tableRowClassName">
+		<el-table :data="data instanceof Array ? cloneData : data.records||[]" ref="table" class="mainTable" :height="tableHeight"  :row-key="getRowKeys" @setCurrentRow="setCurrentRow" @current-change="currentRowChange" highlight-current-row @row-click="checkRow" @selection-change="handleSelectionChange" @select="selectCheckBox" @select-all="selectAllCheckBox" :header-row-class-name="tableheaderRowClassName" tooltip-effect="dark" :row-class-name="tableRowClassName">
 			<template v-for="(colConfig, index1) in tableConfig">
 				<el-table-column v-if="colConfig.components" :show-overflow-tooltip="true" v-bind="colConfig" :key="index1 + '1'">
 					<template slot-scope="scope">
-						<component v-for="(component, index) in colConfig.components" :key="index" :is="component.component" :componentProps="component.componentProps" v-bind="component.componentProps" :handleClick="component.handleClick" :colConfig="colConfig" :row="scope.row" :tableData="data instanceof Array ? data : data.records"> </component>
+						<component v-for="(component, index) in colConfig.components" :key="index" :is="component.component" :componentProps="component.componentProps" v-bind="component.componentProps" :handleClick="component.handleClick" :colConfig="colConfig" :row="scope.row" :tableData="data instanceof Array ? cloneData : data.records"> </component>
 					</template>
 				</el-table-column>
 				<el-table-column v-else-if="colConfig.component" :show-overflow-tooltip="true" v-bind="colConfig" :key="index1 + '2'">
 					<template slot-scope="scope" v-if="colConfig.component">
-						<component :is="colConfig.component" :componentProps="colConfig.componentProps" v-bind="colConfig.componentProps" :handleClick="colConfig.handleClick" :colConfig="colConfig" :row="scope.row" :tableData="data instanceof Array ? data : data.records"> </component>
+						<component :is="colConfig.component" :componentProps="colConfig.componentProps" v-bind="colConfig.componentProps" :handleClick="colConfig.handleClick" :colConfig="colConfig" :row="scope.row" :tableData="data instanceof Array ? cloneData : data.records"> </component>
 					</template>
 				</el-table-column>
 				<slot v-else-if="colConfig.slot" :name="colConfig.slot"></slot>
@@ -19,7 +19,11 @@
 				</el-table-column>
 				<el-table-column v-else :show-overflow-tooltip="true"  v-bind="colConfig" :key="index1 + '5'" :reserve-selection="true">
 				    <template slot-scope="{row,$index}">
-                        <span v-if="colConfig.formatter"  > {{colConfig.formatter(row,colConfig.prop,row[colConfig.prop])}}</span>
+                         <span class="spaninput" v-if="row._showinput_&&$index===0"  >
+                            <el-input  v-if="colConfig.type=='text'" @keyup.enter.native="searchData('input',row)"  v-model="rowObj[colConfig.prop]" clearable></el-input>
+<!--                            <span v-else></span>-->
+                         </span>
+                        <span v-else-if="colConfig.formatter"  > {{colConfig.formatter(row,colConfig.prop,row[colConfig.prop])}}</span>
                         <span  v-else-if="colConfig.buttons"    >
                             <template v-for="btnItem in colConfig.buttons">
                                 <el-button @click="eventEmit(colConfig,row[colConfig.prop],btnItem.event,$index)" size="mini"  >{{btnItem.name}}</el-button>
@@ -38,32 +42,62 @@
 	</div>
 </template>
 <script>
-import { cloneDeep } from 'lodash';
+import { cloneDeep ,map} from 'lodash';
 export default {
 	name: 'Ftable',
 	props: ['tableConfig', 'data', 'height', 'offsetTop', 'page'],
 	data() {
 		return {
+            rowObj:{},
+            propArr:[],
+            cloneData:[],
+            searchObj:{},
 			tableHeight: 50,
 			fTableWrapperHeight:'0px',
 			hideOnSinglePage:false,
+            showinput:false
 		};
 	},
 	watch: {
 		data: function(newVal, oldVal) {
-			// if (newVal.records.length != 0) {
-			// 重新计算element表格组件布局
-			setTimeout(() => {
-				this.$refs.table.doLayout();
-			}, 100);
-
-			// }
+            if(this.dataType){
+                this.cloneData=[...this.data]
+            }else{
+                // this.cloneData=this.data
+                setTimeout(() => {
+                    this.$refs.table.doLayout();
+                }, 100);
+            }
 		},
+        cloneData: function(newVal, oldVal) {
+            setTimeout(() => {
+                this.$refs.table.doLayout();
+            }, 100);
+        },
+
 	},
 	created() {
-
 	},
+
 	computed:{
+        dataType(){
+          return Array.isArray(this.data)
+        },
+        getForData(){
+            if(this.showinput){
+                let arr=[...this.cloneData]
+                arr.shift()
+                return arr
+            }
+            return this.cloneData
+        },
+        getCloneData(){
+            return (arr)=>{
+                console.log(this.cloneData.slice(0, 1));
+                this.showinput? arr.unshift({_showinput_:true}):''
+                return arr
+            }
+        },
 		computeFtableHeight:function(){
 			this.$nextTick(()=>{
 				let parentHeight=this.$refs.fTableWrapper.parentNode.offsetHeight;
@@ -74,6 +108,61 @@ export default {
 		},
 	},
 	methods: {
+
+        showForm(){
+             if(!this.dataType){
+                this.$message.info('暂不支持 分页 搜索')
+                return
+            }
+            this.showinput=!this.showinput
+            this.showinput?this.cloneData.unshift({_showinput_:true})
+                :this.cloneData.shift()
+
+        },
+        searchData(type,data){
+            if(!this.dataType){
+                this.$message.info('暂不支持 分页 搜索')
+                return
+            }
+            if(type=='fuzzy'){
+                this.filterAllFuzzy(data)
+            }else{
+               this.fileterProp(data)
+            }
+        },
+        filterAllFuzzy(value){
+            if(!value){
+                this.cloneData=this.getCloneData([...this.data])
+                return
+            }
+            let arr=[]
+            console.log(this.getForData);
+            map(this.data,(k)=>{
+               let blo= this.propArr.some((key)=>{
+                    return k[key]&&k[key].includes(value)
+                })
+                blo&&arr.push(k)
+            })
+            this.cloneData=this.getCloneData(arr)
+        },
+        fileterProp(){
+            let arr=[]
+             map(this.data,(k)=>{
+                let blo=true
+                map(this.rowObj,(value,key)=>{
+                    let s=k[key]
+                    console.log(k,k[key],this.rowObj,key,value,s,!s.includes(value));
+                    if(!value){
+                        return
+                    }
+                    if(!s||(s&&!s.includes(value))){
+                       blo=false
+                   }
+                })
+                blo&&arr.push(k)
+            })
+            this.cloneData=this.getCloneData(arr)
+        },
 		// 确定唯一的key值
 		getRowKeys(row) {
 			return row.id; // 每条数据的唯一识别值
@@ -155,7 +244,10 @@ export default {
 	
 		},
         eventEmit(colConfig,value,btnEvent,index){
-            this.$emit(colConfig.event, {type:colConfig.type,code:colConfig.prop,value,event:btnEvent,index})
+            this.$emit(colConfig.event, {
+                type:colConfig.type,code:colConfig.prop,value,event:btnEvent,index,
+                contrastLayer:colConfig.contrastLayer,contrastLayerAtr:colConfig.contrastLayerAtr,
+            })
         }
 	},
 	mounted() {
@@ -169,7 +261,11 @@ export default {
 			//this.resizeCallback.push(this.resize);
 			//let parentHeight=this.$refs.fTableWrapper.parentNode.offsetHeight;
 			this.getHeight();
+            map(this.tableConfig,(k)=>{
+                k.type=='text'&& this.propArr.push(k.prop)
+            })
 		});
+
 	},
 	updated(){
 		this.$nextTick(()=>{
@@ -183,4 +279,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.spaninput{
+    .el-input{
+        max-width: 140px;
+    }
+}
 </style>
