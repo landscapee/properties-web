@@ -300,24 +300,19 @@ export default {
             this.$set(item,'contrastLayerAtr','')
         },
         getContrastLayerAtr(id){
-
+            let transObj = {
+                point: "point",
+                line: "lineString",
+                polygon: "polygon",
+            }
             this.contrastLayerAtrListObj[id]=[]
             let arr=JSON.parse(this.contrastLayerListObj[id])||[]
-             map(arr,(k,l)=>{
-
-                let transObj = {
-                    point: "point",
-                    line: "lineString",
-                    polygon: "polygon",
-                }
-                if(transObj[k.type]){
-                    this.contrastLayerAtrListObj[id].push({
-                        ...k,
-                        endValue:k.code+'$_$'+k.type
-                    })
-                }
-
+            this.contrastLayerAtrListObj[id]=filter(arr,k=>{
+                k.endValue=k.code+'$_$'+k.type
+                return transObj[k.type]
             })
+
+
             console.log(111, this.contrastLayerAtrListObj[id]);
         },
         async getRelateObjectFn() {
