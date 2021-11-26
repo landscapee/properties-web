@@ -26,8 +26,10 @@
             <div  class="title_boxNew">
                 <div class="item">
 
-                    <el-input v-model="text" @keyup.enter.native="searchChange"></el-input>
-                    <el-button type="primary" size="mini" @click="handleSearch" icon="el-icon-search">搜索</el-button>
+                    <el-input v-model="text"  @keyup.enter.native="searchChange" clearable>
+                        <i style="color:#d2d6e0" slot="prefix" class="el-input__icon el-icon-search"></i>
+                    </el-input>
+                    <el-button class="searchbutton" plain type="primary" size="mini" @click="handleSearch" icon="el-icon-search">高级搜索</el-button>
                     <el-button v-if="editable" class="add_btn" type="primary" @click="handleAdd">添加</el-button>
                 </div>
             </div>

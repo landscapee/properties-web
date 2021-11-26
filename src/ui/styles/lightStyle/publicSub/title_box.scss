@@ -96,8 +96,28 @@
     }
     .el-input{
       width: 180px;
+      .el-input__icon{
+        line-height: 32px;
+      }
+      .el-input__inner{
+        //padding: 0 20px 0 8px;
+      }
+      .el-icon-circle-close{
+        margin-top: 4px;
+      }
+      .el-input__prefix{
+        //left: auto;
+        //right: 0;
+      }
     }
-    .el-button{
-
+    .searchbutton{
+        .el-icon-search{
+          color: #409EFF;
+        }
+    }
+    .searchbutton:hover{
+      .el-icon-search{
+        color: #fff;
+      }
     }
   }

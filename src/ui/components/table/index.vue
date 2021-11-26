@@ -14,13 +14,17 @@
 				</el-table-column>
 				<slot v-else-if="colConfig.slot" :name="colConfig.slot"></slot>
 				<el-table-column type="index" v-else-if="colConfig.type==='index'" :show-overflow-tooltip="true" v-bind="colConfig" :key="index1 + '3'">
+                    <template slot-scope="{row,$index}">
+                        {{showinput?row._showinput_?'': $index:$index+1 }}
+                    </template>
+
 				</el-table-column>
 				<el-table-column v-else-if="colConfig.type==='selection'" :reserve-selection="true" :show-overflow-tooltip="true" v-bind="colConfig" :key="index1 + '4'">
 				</el-table-column>
 				<el-table-column v-else :show-overflow-tooltip="true"  v-bind="colConfig" :key="index1 + '5'" :reserve-selection="true">
 				    <template slot-scope="{row,$index}">
                          <span class="spaninput" v-if="row._showinput_&&$index===0"  >
-                            <el-input   @keyup.enter.native="searchData('input',row)"  v-model="rowObj[colConfig.prop]" clearable></el-input>
+                            <el-input v-if="colConfig.type=='text'||!colConfig.type"   @keyup.enter.native="searchData('input',row)"  v-model="rowObj[colConfig.prop]" clearable></el-input>
 <!--                            <span v-else></span>-->
                          </span>
                         <span v-else-if="colConfig.formatter"  > {{colConfig.formatter(row,colConfig.prop,row[colConfig.prop])}}</span>
@@ -126,11 +130,14 @@ export default {
             }
             if(type=='fuzzy'){
                 this.filterAllFuzzy(data)
-            }else{
+            }else if(type=='input'){
                this.fileterProp(data)
+            } else{
+                this.otherSearch(data)
             }
         },
         filterAllFuzzy(value){
+            console.log(value,this.data);
             if(!value){
                 this.cloneData=this.getCloneData([...this.data])
                 return
@@ -158,6 +165,26 @@ export default {
                     if(!s||(s&&!s.includes(value))){
                        blo=false
                    }
+                })
+                blo&&arr.push(k)
+            })
+            this.cloneData=this.getCloneData(arr)
+        },
+        otherSearch(value){
+            console.log(value,this.data,this.tableConfig);
+            if(!value){
+                this.cloneData=this.getCloneData([...this.data])
+                return
+            }
+            let arr=[]
+            // console.log(this.getForData);
+            map(this.data,(k)=>{
+                let blo= this.tableConfig.some((kc)=>{
+                    console.log('kc',kc);
+                    if(kc.prop){
+                        return k[kc.prop]&&k[kc.prop].includes(value)
+                    }
+                    return false
                 })
                 blo&&arr.push(k)
             })

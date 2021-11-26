@@ -15,12 +15,14 @@
         </div>
     </div>
     <div class="classify_info">
-      
+
         <div  class="title_boxNew">
             <div class="item">
 
-                <el-input v-model="text" @keyup.enter.native="searchChange"></el-input>
-                <el-button type="primary" size="mini" @click="handleSearch" icon="el-icon-search">搜索</el-button>
+                <el-input   v-model="text" @keyup.enter.native="searchChange" clearable>
+                    <i style="color:#d2d6e0" slot="prefix" class="el-input__icon el-icon-search"></i>
+                </el-input>
+                <el-button class="searchbutton" plain type="primary" size="mini" @click="handleSearch" icon="el-icon-search">高级搜索</el-button>
                 <el-button class="add_btn" @click="handleCreateParams" type="primary" v-if="categoryId">新建参数</el-button>
             </div>
         </div>
@@ -124,7 +126,7 @@ export default {
   methods:{
       searchChange(){
           console.log(1121);
-          this.$refs.table.searchData('fuzzy',this.text)
+          this.$refs.table.searchData('other',this.text)
       },
       handleSearch(){
           this.$refs.table.showForm()
