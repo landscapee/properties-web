@@ -23,12 +23,12 @@
             <div style="text-align:center" v-else>暂无数据</div>
         </div>
         <div class="classify_info">
-            <div v-if="editable" class="title_boxNew">
+            <div  class="title_boxNew">
                 <div class="item">
 
                     <el-input v-model="text" @keyup.enter.native="searchChange"></el-input>
                     <el-button type="primary" size="mini" @click="handleSearch" icon="el-icon-search">搜索</el-button>
-                    <el-button class="add_btn" type="primary" @click="handleAdd">添加</el-button>
+                    <el-button v-if="editable" class="add_btn" type="primary" @click="handleAdd">添加</el-button>
                 </div>
             </div>
             <Ftable ref="table" :data="tableData" :tableConfig="tableConfig" :offsetTop="100" @handleSizeChange="handleSizeChange"

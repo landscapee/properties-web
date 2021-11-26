@@ -10,12 +10,12 @@
     <div style="height:100%;width:100%">
         <!--      input  复制辅助-->
         <input style="opacity: 0;width:10px;position: absolute" ref="copyText" readonly="readonly" :value="coordinatesValue">
-        <div v-if="editable" class="title_boxNew">
+        <div  class="title_boxNew">
             <div class="item">
 
                 <el-input v-model="text" @keyup.enter.native="searchChange"></el-input>
                 <el-button type="primary" size="mini" @click="handleSearch" icon="el-icon-search">搜索</el-button>
-                <el-button class="add_btn" type="primary" @click="handleAdd">添加</el-button>
+                <el-button v-if="editable" class="add_btn" type="primary" @click="handleAdd">添加</el-button>
             </div>
         </div>
         <Ftable ref="table" :data="tableData" :tableConfig="tableConfig" :offsetTop="47" @handleCurrentChange="handleCurrentChange"

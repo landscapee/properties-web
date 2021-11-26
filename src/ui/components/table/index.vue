@@ -20,7 +20,7 @@
 				<el-table-column v-else :show-overflow-tooltip="true"  v-bind="colConfig" :key="index1 + '5'" :reserve-selection="true">
 				    <template slot-scope="{row,$index}">
                          <span class="spaninput" v-if="row._showinput_&&$index===0"  >
-                            <el-input  v-if="colConfig.type=='text'" @keyup.enter.native="searchData('input',row)"  v-model="rowObj[colConfig.prop]" clearable></el-input>
+                            <el-input   @keyup.enter.native="searchData('input',row)"  v-model="rowObj[colConfig.prop]" clearable></el-input>
 <!--                            <span v-else></span>-->
                          </span>
                         <span v-else-if="colConfig.formatter"  > {{colConfig.formatter(row,colConfig.prop,row[colConfig.prop])}}</span>

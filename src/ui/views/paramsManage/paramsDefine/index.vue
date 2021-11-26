@@ -15,14 +15,18 @@
         </div>
     </div>
     <div class="classify_info">
-      <div class="title_box">
-          <div style="margin-left: auto;">
-               <el-button class="add_btn" @click="handleCreateParams" type="primary" v-if="categoryId">新建参数</el-button>
-          </div>
-      </div>
-      <Ftable :data="tableData" :tableConfig="tableConfig" :offsetTop="100" @handleSizeChange="handleSizeChange" @handleCurrentChange="handleCurrentChange">
+      
+        <div  class="title_boxNew">
+            <div class="item">
+
+                <el-input v-model="text" @keyup.enter.native="searchChange"></el-input>
+                <el-button type="primary" size="mini" @click="handleSearch" icon="el-icon-search">搜索</el-button>
+                <el-button class="add_btn" @click="handleCreateParams" type="primary" v-if="categoryId">新建参数</el-button>
+            </div>
+        </div>
+      <Ftable ref="table" :data="tableData" :tableConfig="tableConfig" :offsetTop="100" @handleSizeChange="handleSizeChange" @handleCurrentChange="handleCurrentChange">
           <el-table-column slot="operation" :width="150" fixed="right" label="操作" align="center">
-              <span slot-scope="{ row }" class="operation">
+              <span v-if="!row._showinput_"  slot-scope="{ row }" class="operation">
                    <span title="编辑" class="icon_box" @click="handleClickEdit(row)">
                     <icon-svg icon-class="table_edit" class="logo"></icon-svg>
                   </span>
@@ -46,6 +50,7 @@ export default {
   data(){
     return {
       key:'',
+        text: '',
       treeData:[],
       treeConfig:{
           operation:true,
@@ -117,6 +122,13 @@ export default {
       }
   },
   methods:{
+      searchChange(){
+          console.log(1121);
+          this.$refs.table.searchData('fuzzy',this.text)
+      },
+      handleSearch(){
+          this.$refs.table.showForm()
+      },
     async getParammsClassifyFn(){
       let res= await requestApi.system.getAll({
         method:"postquery",
