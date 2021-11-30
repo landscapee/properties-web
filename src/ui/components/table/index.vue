@@ -25,7 +25,6 @@
 				    <template slot-scope="{row,$index}">
                          <span class="spaninput" v-if="row._showinput_&&$index===0"  >
                             <el-input @change="searchData('input',row)"  v-if="colConfig.type=='text'||!colConfig.type"     v-model="rowObj[colConfig.prop]" clearable></el-input>
-<!--                            <span v-else></span>-->
                          </span>
                         <span v-else-if="colConfig.formatter"  > {{colConfig.formatter(row,colConfig.prop,row[colConfig.prop])}}</span>
                         <span  v-else-if="colConfig.buttons"    >
@@ -64,6 +63,8 @@ export default {
 	},
 	watch: {
 		data: function(newVal, oldVal) {
+            this.showinput=false
+            this.rowObj={}
             if(this.dataType){
                 this.cloneData=[...this.data]
             }else{

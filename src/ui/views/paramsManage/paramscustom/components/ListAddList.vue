@@ -324,6 +324,7 @@
                 }
             },
             handleClickCategory(item) {
+                this.text=''
                 this.categoryId = item.id;
                 this.getListParameterCFn()
             },

@@ -212,6 +212,7 @@ export default {
         }, '*');
     },
     handleSelect(data){
+          this.text=''
         this.categoryId=data.id;
         this.getListFn();
     },
