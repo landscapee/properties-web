@@ -13,7 +13,7 @@
         <div  class="title_boxNew">
             <div class="item">
 
-                <el-input v-model="text" @keyup.enter.native="searchChange" clearable>
+                <el-input v-model="text" @change="searchChange" clearable>
 
                     <i style="color:#d2d6e0" slot="prefix" class="el-input__icon el-icon-search"></i>
 
@@ -120,7 +120,6 @@ export default {
     },
     methods: {
         searchChange(){
-            console.log(1121);
             this.$refs.table.searchData('fuzzy',this.text)
         },
         handleSearch(){

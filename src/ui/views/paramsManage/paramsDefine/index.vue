@@ -19,7 +19,7 @@
         <div  class="title_boxNew">
             <div class="item">
 
-                <el-input   v-model="text" @keyup.enter.native="searchChange" clearable>
+                <el-input   v-model="text" @change="searchChange" clearable>
                     <i style="color:#d2d6e0" slot="prefix" class="el-input__icon el-icon-search"></i>
                 </el-input>
                 <el-button class="searchbutton" plain type="primary" size="mini" @click="handleSearch" icon="el-icon-search">高级搜索</el-button>
@@ -125,8 +125,7 @@ export default {
   },
   methods:{
       searchChange(){
-          console.log(1121);
-          this.$refs.table.searchData('other',this.text)
+           this.$refs.table.searchData('other',this.text)
       },
       handleSearch(){
           this.$refs.table.showForm()

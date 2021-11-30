@@ -34,7 +34,6 @@ module.exports = merge(common, {
                 pathRewrite: {
                     '^/api/param': ''
                 }
-                
             }      
         },
         //lazy: true, // 惰性模式
