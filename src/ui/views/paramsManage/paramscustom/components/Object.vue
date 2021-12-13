@@ -29,9 +29,9 @@
             <template v-else-if="showCoordinatesBt(item)">
                 <input  :ref="'copyText'+index"  class="copy-txt"  :value="item.value">
 
-                <el-button @click="handleMap1({...item,id:form.id},true)" >查看</el-button>
+                <el-button @click="handleMap1({...item,row:item,id:form.id},true)" >查看</el-button>
                 <el-button @click="copyData(item.value,'copyText'+index)" >复制数据</el-button>
-                <el-button @click="handleMap1({...item,id:form.id})" v-if="showCoordinatesBt(item)">选取坐标</el-button>
+                <el-button @click="handleMap1({...item,row:item,id:form.id})" v-if="showCoordinatesBt(item)">选取坐标</el-button>
             </template>
             <el-input v-model="item.value" :class="{resetWidth:showCoordinatesBt(item)}" placeholder="请输入" v-else></el-input>
 
@@ -45,18 +45,20 @@
 </template>
 
 <script>
-import {cloneDeep} from 'lodash';
+import {cloneDeep, map} from 'lodash';
 import requestApi from '@/api/index.js';
 import {mapGetters} from "vuex"
 import DrawMixins from './drawMixins'
 export default {
     name: 'Object',
-    props: ['paramsProperties'],
+    props: ['paramsProperties','paramName'],
     data() {
         return {
             form: {
                 properties: [],
                 id: '',
+                paramsProperties:[],
+                paramName:'',
             },
             rules: {},
         }
@@ -67,7 +69,14 @@ export default {
         this.getObjParameterFn();
     },
     methods: {
-
+        getIsValue( ) {
+            let isValueText=null
+            map(this.form.properties,(k)=>{
+                console.log(this.form.properties, k);
+                k.isValue&&(isValueText=k.code)
+            })
+            return isValueText
+        },
         //处理渲染数据
         handleProperties(data) {
             this.form.properties = data.map((item, i) => {
@@ -117,6 +126,8 @@ export default {
                     }
                 })
             }
+            console.log(this.form);
+
         },
         async getParameterInfoFn(id, i) {
             let res = await requestApi.parameterManage.getListParameter({

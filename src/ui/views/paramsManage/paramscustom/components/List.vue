@@ -43,11 +43,12 @@ import requestApi from '@/api/index.js';
 import Ftable from '@/components/table';
 import Sortable from 'sortablejs';
 import DrawMixins from './drawMixins'
+import {map} from "lodash";
 
 export default {
     name: 'List',
     components: {Ftable},
-    props: ['editable','sortable', 'paramsProperties'],
+    props: ['editable','sortable','paramName', 'paramsProperties'],
     data() {
         return {
             key: '',
@@ -119,6 +120,7 @@ export default {
         })
     },
     methods: {
+
         searchChange(){
             this.$refs.table.searchData('fuzzy',this.text)
         },
@@ -140,7 +142,6 @@ export default {
         },
         loadRelationData(item) {
             this.$axios.post("/api/param/parameterManage/get?id=" + item.relateObjectId, {}).then(response => {
-
                 let properties = JSON.parse(response.data.data.properties);
 
                 let valueField = null;
@@ -259,6 +260,7 @@ export default {
                 path: 'addList',
                 query: {
                     isEdit: true,
+                    paramName:this.paramName,
                     parameterId: this.$route.query.id, ...row,
                     properties: [...this.paramsProperties]
                 },

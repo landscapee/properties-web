@@ -85,7 +85,8 @@ export default {
           }else{
             return '--'
           }
-        } },
+        },filterList__:(()=>this.paramsList) ,
+        },
         { prop: 'comment', label: '描述', align: 'center' },
         { prop: 'time', label: '创建时间', align: 'center' },
         { slot: 'operation' },

@@ -29,9 +29,9 @@
             <template v-else-if="showCoordinatesBt(item)">
                 <input   :ref="'copyText'+index" readonly="readonly" class="copy-txt"  :value="item.value">
 
-                <el-button @click="handleMap1(item,true)" >查看</el-button>
+                <el-button @click="handleMap1({...item,row:getRow},true)" >查看</el-button>
                 <el-button @click="copyData(item.value,'copyText'+index)" >复制数据</el-button>
-                <el-button @click="handleMap1(item)" v-if="showCoordinatesBt(item)">选取坐标</el-button>
+                <el-button @click="handleMap1({...item,row:getRow})" v-if="showCoordinatesBt(item)">选取坐标</el-button>
             </template>
             <el-input v-model="item.value"   placeholder="请输入" v-else></el-input>
 
@@ -45,6 +45,7 @@
 <script>
 import requestApi from '@/api/index.js';
  import DrawMixins from "../components/drawMixins";
+import {map} from "lodash";
 export default {
     name:'addList',
     data(){
@@ -53,15 +54,27 @@ export default {
                 properties:[],
             },
             parameterId:'',
+            paramsProperties:[],
+            paramName:'',
             id:'',
             isEdit:false,
         }
     },
     mixins:[DrawMixins],
-
+    computed:{
+      getRow(){
+          let row={}
+          map(this.form.properties,k=>{
+              row[k.code]=k.value
+          })
+          return row
+        }
+    },
     mounted(){
         let query=this.$route.query;
         this.parameterId=query.parameterId;
+        this.paramsProperties=query.properties;
+        this.paramName=query.paramName;
         this.isEdit=query.isEdit;
         console.log(query)
         this.handleProperties(query)
@@ -71,6 +84,14 @@ export default {
         
     },
     methods:{
+        getIsValue( ) {
+            let isValueText=null
+            map(this.form.properties,(k)=>{
+                console.log(this.form.properties, k);
+                k.isValue&&(isValueText=k.code)
+            })
+            return isValueText
+        },
         //处理显示字段和值字段
         handleValueAndText(data){
             let value={isText:'',isValue:''};

@@ -1,0 +1,35 @@
+.el-dialog__headerbtn{
+  top:14px;
+}
+.el-dialog__close{
+  padding: 3px;
+  border-radius: 50px;
+  background: white;
+  //border: 3px #909399 solid;
+}
+.el-dialog__close:before{
+  font-size: 16px;
+  font-weight: bold;
+}
+.el-dialog__header{
+  padding: 0;
+  height: 50px;
+  line-height: 50px;
+  background: #3d568e;
+  .el-dialog__title {
+    font-size: 18px;
+    color: #ffffff;
+  }
+}
+.el-date-editor{
+  position: relative!important;
+  .el-input__prefix{
+    position: absolute;
+    right:5px;
+    top:0;
+    left:auto;
+  }
+  .el-input__inner{
+    padding-left: 15px;
+  }
+}

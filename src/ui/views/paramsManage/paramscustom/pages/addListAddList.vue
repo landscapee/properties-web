@@ -29,9 +29,9 @@
             <template v-else-if="showCoordinatesBt(item)">
                 <input   v-model="item.value"  :ref="'copyText'+index"  class="copy-txt"  >
 <!--                readonly="readonly"-->
-                <el-button @click="handleMap1({...item,id,ChildrenList:true},true)" >查看</el-button>
+                <el-button @click="handleMap1({...item,id,ChildrenList:true,row:getRow},true)" >查看</el-button>
                 <el-button @click="copyData(item.value,'copyText'+index)" >复制数据</el-button>
-                <el-button @click="handleMap1({...item,id,ChildrenList:true})" v-if="showCoordinatesBt(item)">选取坐标</el-button>
+                <el-button @click="handleMap1({...item,id,ChildrenList:true,row:getRow})" v-if="showCoordinatesBt(item)">选取坐标</el-button>
             </template>
             <el-input v-model="item.value"  placeholder="请输入" v-else></el-input>
             <el-button @click="handleMap" v-if="item.type==='gismap'">选取坐标</el-button>
@@ -47,6 +47,7 @@ import requestApi from '@/api/index.js';
 import {mapGetters} from "vuex"
 import { constants, copyFileSync } from 'fs';
 import DrawMixins from "../components/drawMixins";
+import {map} from "lodash";
 export default {
     name:'addList',
     data(){
@@ -59,6 +60,8 @@ export default {
             parentDataId:'',
             id:'',
             isEdit:false,
+            paramsProperties:[],
+            paramName:'',
             gisInfo:{
                 coordinates:[],
                 type:''
@@ -68,7 +71,14 @@ export default {
     mixins:[DrawMixins],
 
     computed:{
-        ...mapGetters(['getGisinfo'])
+        ...mapGetters(['getGisinfo']),
+        getRow(){
+            let row={}
+            map(this.form.properties,k=>{
+                row[k.code]=k.value
+            })
+            return row
+        }
     },
     watch:{
         getGisinfo:{
@@ -88,6 +98,8 @@ export default {
         let query=this.$route.query;
         this.parameterId=query.parameterId;
         this.parentDataId=query.parentDataId;
+        this.paramsProperties=query.properties;
+        this.paramName=query.paramName;
         this.isEdit=query.isEdit;
         console.log('query',query);
         this.rowIndex=query.index;
@@ -98,29 +110,24 @@ export default {
        
     },
     methods:{
-        getClassifyData(id, code,type) {
+        getIsValue( ) {
+            let isValueText=null
+            map(this.form.properties,(k)=>{
+                console.log(this.form.properties, k);
+                k.isValue&&(isValueText=k.code)
+            })
+            return isValueText
+        },
+        getClassifyData(id, code,type,item) {
             return this.$axios.post("/api/param/parameter-list/get", {
                 parameterId: this.parameterId,
                 parentDataId: this.parentDataId,
             }).then(res => {
                 let data = res.data.data
                 let index = data.findIndex((d) => d.id === id)
-                console.log(id,index, code, type,res);
-
                 data.splice(index, 1)
-                let arr = []
-                data.length&&data.map((item) => {
-                    let itemValue= JSON.parse(item.value);
-                    let coordinates
-                    try {
-                        coordinates = JSON.parse(itemValue[code]);
-                    } catch (e) {
-                        coordinates = null
-                    }
-                // ,id:this.$uuid()
-                    coordinates&&arr.push({coordinates, type})
-                });
-                return arr
+                // let properties=this.getProperties(item)
+                return this.getGeoJson(data,code,type,item,true)
             });
         },
         handleMapData(data){

@@ -3,6 +3,7 @@
 </template>
 <script>
 import {mapGetters} from "vuex"
+import {map} from "lodash";
 
 export default {
     name: "drawMinxs",
@@ -51,45 +52,77 @@ export default {
                 : this.$message.info('复制失败');
 
         },
-
+        createGeoJson(features){
+            return  {
+                "creator": "geojson",
+                "features": features||[],
+                "type": "FeatureCollection"
+            }
+        },
+        createFeature(type,coordinates,properties){
+            return  {
+                "geometry": {"type": type, "coordinates": [coordinates]},
+                "properties": properties,
+                "type": "Feature"
+            }
+        },
+        getCoor(coor){
+          let coorDinates=''
+            try{
+                coorDinates=JSON.parse(coor)
+            }catch (e){
+                coorDinates=null
+            }
+            return coorDinates
+        },
         async handleMap1(item, unEdit) {
             console.log('item',item);
-            let classifyData=[]
-            let contrastLayerData=[]
-            if ((item.type == 'line' || item.type == 'polygon')&&item.ChildrenList) {
-                let transObj = {
-                    point: "Point",
-                    line: "LineString",
-                    polygon: "Polygon",
-                }
-                classifyData=await this.getClassifyData(item.id, item.code,transObj[item.type])
+            //显示子列表的 兄弟 要素 和参考图层的要素
+            let geoJson = this.createGeoJson()
+            let transObj = {
+                point: "Point",
+                line: "LineString",
+                polygon: "Polygon",
             }
-            if(item.contrastLayer&&item.contrastLayerAtr){
-                contrastLayerData= await this.getContrastLayerData(item)
-            }
+             if ((item.type == 'line' || item.type == 'polygon') && item.ChildrenList) {
 
-            console.log(classifyData,contrastLayerData);
-            let data = {
-                coordinates: item.value,
-                type: item.type,
-                unEdit: unEdit,
-                classifyData:[...classifyData,...contrastLayerData]
+                geoJson = await this.getClassifyData(item.id, item.code, transObj[item.type],{...item})
             }
+            //处理参考图层
+            if (item.contrastLayer && item.contrastLayerAtr) {
+                let contrastLayerData = await this.getContrastLayerData(item)
+                // console.log(110,geoJson,contrastLayerData);
+                geoJson.features.push(...contrastLayerData)
+            }
+            let coor=this.getCoor(item.value)
+            let   editGeoJson=coor&&this.createGeoJson(
+                [this.createFeature(transObj[item.type], coor, this.getProperties(item))])
+            // console.log(item,geoJson,editGeoJson);
+            let data = {
+                coordinates: coor,
+                type: transObj[item.type],
+                unEdit: unEdit,
+                 editGeoJson,
+                geoJson,
+            }
+            console.log(data);
             window.parent.postMessage({
                 state: 'drapMap',
                 data,
             }, '*');
         },
-        getContrastLayerData(item){
+
+        async getContrastLayerData(item) {
+            let obj=await this.getIsValue1(item.contrastLayer)
+            // console.log(obj,111,item);
             return this.$axios.post("/api/param/parameter-list/get", {
                 parameterId: item.contrastLayer,
             }).then(res => {
                 let data = res.data.data
-                console.log(1241,data);
-                let [code,type]=item.contrastLayerAtr.split('$_$')
-                let arr = []
-                data.length&&data.map((item) => {
-                    let itemValue= JSON.parse(item.value);
+                 let [code, type] = item.contrastLayerAtr.split('$_$')
+                let features = []
+                data.length && data.map((item) => {
+                    let itemValue = JSON.parse(item.value);
                     let coordinates
                     try {
                         coordinates = JSON.parse(itemValue[code]);
@@ -101,12 +134,86 @@ export default {
                         line: "LineString",
                         polygon: "Polygon",
                     }
-                    coordinates&&Array.isArray(coordinates)&&arr.push({coordinates, type:transObj[type]})
+
+                    if (coordinates && Array.isArray(coordinates)) {
+                        let properties={"name": obj.name,
+                            isValueName__:obj.codeName,
+                            isValueCode__:obj.code,
+                            isValueValue__:itemValue[obj.code]
+                        }
+                        // properties[obj.code]=itemValue[obj.code]
+                        // console.log(231,itemValue,properties);
+                        let feature = {
+                            "geometry": {"type": transObj[type], "coordinates": [coordinates]},
+                            "properties": properties,
+                            "type": "Feature"
+                        }
+                        features.push(feature)
+                    }
                 });
-                return arr
+                return features
             });
         },
 
+        async getIsValue1(id) {
+            let a = await this.$axios.post(`/api/param/parameterManage/get?id=${id}`, {})
+            let code=null,name=null,codeName;
+            if(a.data&&a.data.data){
+                name=a.data.data.name;
+                let arr=a.data.data.properties
+                arr&&(arr=JSON.parse(arr))
+               arr&& map(arr,(k)=>{
+                   // console.log(arr, k);
+                   if(k.isValue){
+                       codeName=k.name;
+                       code=k.code
+                   }
+                })
+            }
+            return {code,codeName,name,}
+        },
+
+        getProperties(item ) {
+            // console.log(item,112211);
+            let code=null,codeName;
+            map(this.paramsProperties,(k)=>{
+                console.log(this.paramsProperties, k);
+                if(k.isValue){
+                    codeName=k.name;
+                    code=k.code
+                }
+            })
+            let properties={
+                "name": this.paramName,
+                isValueName__:codeName,
+                isValueCode__:code,
+                isValueValue__:item.row[code],
+            }
+            // console.log(item);
+            // properties[code]=item.row[code]
+
+            return properties
+        },
+
+        getGeoJson(data, code, type,itemL, isString) {
+            let geoJson = this.createGeoJson()
+            data.length && data.map((item) => {
+                // console.log(item,112);
+                let itemValue = item;
+                if (isString) {
+                    itemValue = JSON.parse(item.value)
+                }
+                let coordinates=this.getCoor(itemValue[code])
+                itemL.row=itemValue
+                let properties=this.getProperties(itemL)
+                if (coordinates) {
+                    let feature=this.createFeature(type,coordinates,properties)
+                    geoJson.features.push(feature)
+                }
+
+            });
+            return geoJson
+        },
     },
 }
 </script>
