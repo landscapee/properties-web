@@ -296,8 +296,8 @@ import request from '@/utils/request'; // get token from cookie
 	.el-scrollbar__wrap {
 		overflow-x: hidden;
 	}
-	.el-card__body {
-		padding: 10px;
+	/deep/ .el-card__body {
+		padding:  0px 10px!important;
 		.item{
 			margin: 20px 0;
 		}
@@ -340,4 +340,10 @@ import request from '@/utils/request'; // get token from cookie
 		height: 30px;
 		width: calc(100% - 1px);
 	}
+    .Qfooter{
+        text-align: center;
+        /deep/ .el-button{
+            padding: 8px 20px;
+        }
+    }
 </style>
