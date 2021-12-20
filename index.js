@@ -39,6 +39,7 @@ router.afterEach((to, from) => {
 })
 
 
+
 new Vue({
     el: '#app',
     components: {App},
@@ -49,5 +50,6 @@ new Vue({
         // 注册并启动webworker
         // const workerProces = new WorkerRegist();
         // workerProces.start()
+
     }
 })

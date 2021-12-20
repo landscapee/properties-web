@@ -9,7 +9,7 @@
 <template>
    <div class="paramscustom">
       <div class="page_content"  v-if="paramsType==='TEXT'||paramsType==='OBJECT'">
-            <SingleValue v-if="paramsType==='TEXT'" :paramsProperties='form.properties' :key="paramsId"></SingleValue>
+            <SingleValue v-if="paramsType==='TEXT'" :editable="form.editable" :paramsProperties='form.properties' :key="paramsId"></SingleValue>
             <Object v-if="paramsType==='OBJECT'"  :paramName="form.name"  :paramsProperties='form.properties' :key="paramsId"></Object>
       </div>
       <List v-if="paramsType==='LIST'" :paramName="form.name" :paramsProperties='form.properties' :editable="form.editable" :sortable="form.sortable" :key="paramsId"></List>

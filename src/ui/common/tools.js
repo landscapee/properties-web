@@ -38,6 +38,8 @@ export const formatTreeData = (d) => {
 	});
 	return d;
 };
+
+
 export const formatSelectData = (d) => {
 	each(d, (item) => {
 		each(item, (v, k) => {

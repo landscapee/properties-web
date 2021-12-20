@@ -37,8 +37,9 @@ export default {
     },
     methods:{
         changeNav(path,children){
+
             this.$router.push({
-                path:path+'/'+children[0].path
+                path:path+'/'+children[0]&&children[0].path||''
             })
         }
     }

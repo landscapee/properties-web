@@ -339,7 +339,17 @@ export default {
 /deep/ th {
     border-top: 1px solid #c7ccd2;
 }
-/deep/ tr{
+/deep/ .tab-header-row{
+    th{
+        background: #57636F;
+
+    }
+    .cell{
+        color: #fff;
+    }
+}
+
+ /deep/ tr{
     th:last-child,
     td:last-child {
         border-right: 1px solid #c7ccd2;

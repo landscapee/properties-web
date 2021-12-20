@@ -251,6 +251,7 @@ export default {
                 type:'edit',
                 id:data.id,
                 pid:data.parentId,
+                permission:data.permission,
                 name:data.name
             }
             this.$router.push({

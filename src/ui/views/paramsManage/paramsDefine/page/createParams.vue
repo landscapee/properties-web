@@ -27,6 +27,17 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item label="参数权限：" >
+                    <el-button @click="userOpen('role')" size="mini" icon="el-icon-plus">选择角色</el-button>
+                    <div class="tagBox">
+                        <el-scrollbar style="height:100px">
+                            <el-tag :key="tag.code" v-for="(tag,index) in roles" closable :disable-transitions="false" @close="handleClose(index)">
+                                {{ tag.name }}
+                            </el-tag>
+                        </el-scrollbar>
+                    </div>
+                </el-form-item>
+
                 <el-form-item label="参数属性" prop="properties2" v-if="form.type==='TEXT'">
                     <el-select v-model="form.properties2" placeholder="请选择">
                         <el-option label="文本" value="text"></el-option>
@@ -71,17 +82,21 @@
                         <el-col :span="5" style="margin-right: 5px">
                             <div style="min-height: 20px">
                                 <el-select v-show="showContrastLayer(item)" v-model="item.contrastLayer" clearable
-                                            @change="hChange(item)"
-                                           placeholder="请选择" style="width:49%"  >
+                                           @change="hChange(item)"
+                                           placeholder="请选择" style="width:49%">
                                     <el-option :label="relateObject.name" :value="relateObject.id"
-                                               v-for="relateObject in relateObjectLists" :key="relateObject.id"></el-option>
+                                               v-for="relateObject in relateObjectLists"
+                                               :key="relateObject.id"></el-option>
 
-                            </el-select>
-                                <el-select style="width:49%" v-show="item.contrastLayer" v-model="item.contrastLayerAtr" clearable
+                                </el-select>
+                                <el-select style="width:49%" v-show="item.contrastLayer" v-model="item.contrastLayerAtr"
+                                           clearable
                                            placeholder="请选择">
-                                <el-option :label="relateObject.name+'('+relateObject.code+')'" :value="relateObject.endValue"
-                                           v-for="relateObject in getcontrastLayerAtrList(item.contrastLayer)" :key="relateObject.code"></el-option>
-                            </el-select>
+                                    <el-option :label="relateObject.name+'('+relateObject.code+')'"
+                                               :value="relateObject.endValue"
+                                               v-for="relateObject in getcontrastLayerAtrList(item.contrastLayer)"
+                                               :key="relateObject.code"></el-option>
+                                </el-select>
                             </div>
                         </el-col>
                         <el-col :span="2" style="margin-right: 5px;text-align:center">
@@ -133,14 +148,18 @@
                 </el-form-item>
             </el-form>
         </div>
+        <roleTree ref="roleBox"  @onSelected="handleRoleSelected"></roleTree>
+
     </div>
 
 </template>
 
 <script>
 import requestApi from '@/api/index.js';
-import {cloneDeep,map,filter} from 'lodash';
-// import { getUserInfo } from '@/util/auth'; // get token from cookie
+import {cloneDeep, map, filter} from 'lodash';
+import request from '@/utils/request'; // get token from cookie
+import roleTree from '@/components/roleTree/index';
+
 export default {
     name: 'createParams',
     data() {
@@ -188,16 +207,18 @@ export default {
             }
         }
         return {
+            roleList: [],
+            roleListObj:{},
             paramsId: '',
             isEdit: false,
-
+            roles:[],
             parentList: [],
             parentOptions: [],
             checked: '',
             relateObjectLists: [], //关联对象list
             // contrastLayerList:[],
-            contrastLayerAtrListObj:{},
-            contrastLayerListObj:{},
+            contrastLayerAtrListObj: {},
+            contrastLayerListObj: {},
             paramsList: [
                 {name: '单值', code: 'TEXT'},
                 {name: '对象', code: 'OBJECT'},
@@ -243,44 +264,35 @@ export default {
             }
         }
     },
+    components:{roleTree},
     mounted() {
         let query = this.$route.query;
         if (query.data) { //编辑
             let data = JSON.parse(query.data);
             this.paramsId = data.id;
             this.isEdit = true;
+            this.form = {...data, permission1: [],
+                comment: data.comment,
+                parentId: data.parentId || '',
+            }
+
             if (data.type === 'TEXT') {
                 this.form = Object.assign({}, this.form, {
-                    systemId: data.systemId,
-                    name: data.name,
-                    type: data.type,
-                    code: data.code,
-                    comment: data.comment,
                     properties2: JSON.parse(data.properties)[0].type,
-                    parentId: data.parentId || '',
-                    editable: data.editable,
-                    sortable: data.sortable,
                 })
             } else {
                 this.form = Object.assign({}, this.form, {
-                    systemId: data.systemId,
-                    name: data.name,
-                    type: data.type,
-                    code: data.code,
-                    comment: data.comment,
                     properties: JSON.parse(data.properties),
-                    parentId: data.parentId || '',
-                    editable: data.editable,
-                    sortable: data.sortable,
-                })
-                console.log(this.form.type)
+                 })
             }
 
         } else {
             this.isEdit = false;
         }
+        console.log(this.form);
         this.parentOptionsFn();
         this.getRelateObjectFn();
+        this.getAllRoles()
     },
     computed: {
         showContrastLayer() {
@@ -289,31 +301,58 @@ export default {
                 return obj[row.type]
             }
         },
-        getcontrastLayerAtrList(){
-            return (id)=>{
+        getcontrastLayerAtrList() {
+            return (id) => {
                 return this.contrastLayerAtrListObj[id]
             }
         }
     },
     methods: {
-        hChange(item){
-            this.$set(item,'contrastLayerAtr','')
+
+        getAllRoles() {
+            let hostname = window.location.hostname
+            if (hostname.indexOf('localhost') >= 0) {
+                hostname = '173.100.1.152'
+            }
+
+            let url = `http://${hostname}:8099/api/sys/role/findAllWithPage?pageNum=1&pageSize=1000 `
+            request({
+                methods: 'get',
+                url,
+            }).then((d) => {
+                // console.log(1221214567/,d);
+                // this.roleList = d.data.list
+                map( d.data.list,k=>{
+                    this.roleListObj[k.code]=k
+                })
+                if(this.form.permission){
+                    let arr=this.form.permission.split(',')
+                    this.roles= map(arr,k=>{
+                        return this.roleListObj[k]
+                    })
+
+                }
+                console.log('this.roles',this.roles);
+            })
+
         },
-        getContrastLayerAtr(id){
+        hChange(item) {
+            this.$set(item, 'contrastLayerAtr', '')
+        },
+        getContrastLayerAtr(id) {
             let transObj = {
                 point: "point",
                 line: "lineString",
                 polygon: "polygon",
             }
-            this.contrastLayerAtrListObj[id]=[]
-            let arr=JSON.parse(this.contrastLayerListObj[id])||[]
-            this.contrastLayerAtrListObj[id]=filter(arr,k=>{
-                k.endValue=k.code+'$_$'+k.type
+            this.contrastLayerAtrListObj[id] = []
+            let arr = JSON.parse(this.contrastLayerListObj[id]) || []
+            this.contrastLayerAtrListObj[id] = filter(arr, k => {
+                k.endValue = k.code + '$_$' + k.type
                 return transObj[k.type]
             })
 
 
-            console.log(111, this.contrastLayerAtrListObj[id]);
         },
         async getRelateObjectFn() {
             let res = await requestApi.parameterManage.getRelateObject({
@@ -323,9 +362,9 @@ export default {
             if (res) {
                 // console.log(1122,res);
                 this.relateObjectLists = res;
-               map(res,k=>{
-                    this.contrastLayerListObj[k.id]=k.properties
-                   this.getContrastLayerAtr(k.id)
+                map(res, k => {
+                    this.contrastLayerListObj[k.id] = k.properties
+                    this.getContrastLayerAtr(k.id)
                 })
             }
         },
@@ -347,6 +386,7 @@ export default {
         async addFn() {
             let data = {
                 ...this.form,
+                permission:this.getPermission(),
                 classifyId: this.$route.query.classifyId
             };
             if (this.form.type === 'TEXT') {
@@ -386,6 +426,7 @@ export default {
             let data = {
                 id: this.paramsId,
                 ...this.form,
+                permission:this.getPermission(),
                 classifyId: this.$route.query.classifyId
             }
             if (this.form.type === 'TEXT') {
@@ -495,10 +536,15 @@ export default {
                 }
             }
         },
+        getPermission(){
+            let arr=map(this.roles,k=>{
+                return k.code
+            })
+            return  arr.join(',')
+        },
         submitForm() {
             this.$refs['ruleForm'].validate((valid) => {
                 if (valid) {
-                    console.log('系统id', this.form.systemId);
                     if (!this.form.systemId) {
                         this.$message({
                             type: "warning",
@@ -516,6 +562,15 @@ export default {
                     return false;
                 }
             });
+        },
+        userOpen( ){
+            this.$refs.roleBox.open(this.roles||[]);
+        },
+        handleClose(index) {
+            this.roles.splice(index,1)
+        },
+        handleRoleSelected(roles){
+            this.roles =  map(roles,(item) => ({ code: item.code, name: item.name }));
         },
 
     }
@@ -577,6 +632,18 @@ export default {
 
 .file-txt {
     text-align: left;
+}
+.tagBox{
+
+    border:1px solid #DCDFE6;
+    margin: 0!important;
+}
+/deep/ .el-scrollbar__view{
+    padding: 0 5px;
+    .el-tag{
+        margin-right: 5px;
+        margin-top: 5px;
+    }
 }
 </style>
 

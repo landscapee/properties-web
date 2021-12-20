@@ -17,10 +17,10 @@
         { required: true, message: '请输入', trigger: 'blur' },
         ]"
     >
-        <el-input v-model="item.value"  placeholder="请输入"></el-input>   
+         <el-input :disabled="!editable" v-model="item.value"  placeholder="请输入"></el-input>
     </el-form-item>
 
-    <el-form-item label="">
+    <el-form-item label="" v-if="editable">
           <el-button type="primary" @click="submitForm" class="dialog_footer_btn no_box_shadow">提 交</el-button>
     </el-form-item>
   </el-form>
@@ -31,7 +31,7 @@ import {cloneDeep}  from 'lodash';
 import requestApi from '@/api/index.js';
 export default {
   name: 'SingleValue',
-  props:['paramsProperties'],
+  props:['paramsProperties','editable'],
   data() { 
     return {
         form:{
