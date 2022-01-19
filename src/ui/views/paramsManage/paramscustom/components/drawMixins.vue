@@ -60,8 +60,14 @@ export default {
             }
         },
         createFeature(type,coordinates,properties){
+
+            let transObj = {
+                Point: coordinates,
+                LineString: coordinates,
+                Polygon: [coordinates],
+            }
             return  {
-                "geometry": {"type": type, "coordinates": [coordinates]},
+                "geometry": {"type": type, "coordinates": transObj[type]},
                 "properties": properties,
                 "type": "Feature"
             }
@@ -97,8 +103,7 @@ export default {
             let coor=this.getCoor(item.value)
             let   editGeoJson=coor&&this.createGeoJson(
                 [this.createFeature(transObj[item.type], coor, this.getProperties(item))])
-            // console.log(item,geoJson,editGeoJson);
-            let data = {
+             let data = {
                 coordinates: coor,
                 type: transObj[item.type],
                 unEdit: unEdit,
@@ -177,8 +182,7 @@ export default {
             // console.log(item,112211);
             let code=null,codeName;
             map(this.paramsProperties,(k)=>{
-                console.log(this.paramsProperties, k);
-                if(k.isValue){
+                 if(k.isValue){
                     codeName=k.name;
                     code=k.code
                 }
@@ -189,8 +193,7 @@ export default {
                 isValueCode__:code,
                 isValueValue__:item.row[code],
             }
-            // console.log(item);
-            // properties[code]=item.row[code]
+
 
             return properties
         },
@@ -198,8 +201,7 @@ export default {
         getGeoJson(data, code, type,itemL, isString) {
             let geoJson = this.createGeoJson()
             data.length && data.map((item) => {
-                // console.log(item,112);
-                let itemValue = item;
+                 let itemValue = item;
                 if (isString) {
                     itemValue = JSON.parse(item.value)
                 }

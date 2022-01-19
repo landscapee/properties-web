@@ -374,8 +374,7 @@ export default {
                 params: {systemId: this.form.systemId}
             });
             if (res) {
-                console.log(res)
-                this.parentOptions = res
+                 this.parentOptions = res
                 if (this.form.type === 'SUB_OBJECT' || this.form.type === 'SUB_LIST') {
                     this.parentList = this.parentOptions['LIST']
                 } else if (this.form.type === 'TREE_LIST') {

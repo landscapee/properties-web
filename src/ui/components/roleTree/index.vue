@@ -4,7 +4,7 @@
 			<el-col :span="12">
 				<div>
 					<el-card class="box-card" shadow="never" border-radius="2px">
-						<div style="height:300px" v-loading="!data.length" >
+						<div style="height:300px" v-loading="dataloading" >
 							<Tree  :data="data" ref="tree" @handleSelect="getListById" :expand-on-click-node="false" :isShow="isShow" :checkedArrIdArr="['first']"   :defaultUnCheck="true"  > </Tree>
 						</div>
 					</el-card>
@@ -62,6 +62,7 @@ import request from '@/utils/request'; // get token from cookie
         name: 'Users',
         data() {
             return {
+                dataloading:true,
                 filterText:'',
                 personNodeIdObj:{},
                 userSelect:[],
@@ -229,11 +230,17 @@ import request from '@/utils/request'; // get token from cookie
                     methods: 'get',
                     url,
                 }).then((d) => {
+                    this.dataloading=false
+
+                    if(d.responseCode=='30008'||d.responseCode=='10000'){
+                       this.$message.warning(d.responseMessage)
+                        this.data=[]
+                        return
+                    }
                     d.data&& d.data[0]&& d.data[0].data&&(d.data[0].data.id='first__')
-
                     this.data=formatTreeData(d.data)
-                    console.log(this.data,12);
-
+                }).catch(e=>{
+                    this.dataloading=false
                 })
             },
 
