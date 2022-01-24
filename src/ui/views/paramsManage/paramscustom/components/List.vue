@@ -90,7 +90,7 @@ export default {
                 }
             }
             return {
-                prop: item.code,
+                 prop: item.code,
                 label: item.name,
                 type:item.type,
                 formatter: (row, cell, value) => {

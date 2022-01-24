@@ -33,7 +33,11 @@
                 <el-button @click="copyData(item.value,'copyText'+index)" >复制数据</el-button>
                 <el-button @click="handleMap1({...item,row:getRow})" v-if="showCoordinatesBt(item)">选取坐标</el-button>
             </template>
-            <el-input v-model="item.value"   placeholder="请输入" v-else></el-input>
+            <el-radio-group v-model="item.value"    v-else-if="item.type=='bool'">
+                <el-radio label="true">真</el-radio>
+                <el-radio label="false">假</el-radio>
+            </el-radio-group>
+             <el-input v-model="item.value"   placeholder="请输入" v-else></el-input>
 
         </el-form-item>
         <el-form-item label="">

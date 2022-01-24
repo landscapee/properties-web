@@ -23,15 +23,22 @@
 				</el-table-column>
 				<el-table-column v-else :show-overflow-tooltip="true"  v-bind="colConfig" :key="index1 + '5'" :reserve-selection="true">
 				    <template slot-scope="{row,$index}">
-                         <span class="spaninput" v-if="row._showinput_&&$index===0"  >
-                            <el-input @change="searchData('input',row)"  v-if="colConfig.type=='text'||!colConfig.type"     v-model="rowObj[colConfig.prop]" clearable></el-input>
+
+                        <span class="spaninput" v-if="row._showinput_&&$index===0"  >
+                            <el-input @change="searchData('input',row,colConfig.type)"  v-if="colConfig.type=='text'||!colConfig.type||colConfig.type=='bool'"     v-model="rowObj[colConfig.prop]" clearable></el-input>
                          </span>
+                        <span  v-else-if="colConfig.type=='bool'"    >
+
+                                {{getBooleanText(row[colConfig.prop])}}
+
+                        </span>
                         <span v-else-if="colConfig.formatter"  > {{colConfig.formatter(row,colConfig.prop,row[colConfig.prop])}}</span>
                         <span  v-else-if="colConfig.buttons"    >
                             <template v-for="btnItem in colConfig.buttons">
                                 <el-button @click="eventEmit(colConfig,row[colConfig.prop],btnItem.event,$index,row)" size="mini"  >{{btnItem.name}}</el-button>
                             </template>
                         </span>
+
                         <span v-else-if="colConfig.prop.split('.').length===3"  >{{row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]][colConfig.prop.split('.')[2]]?row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]][colConfig.prop.split('.')[2]]:"--"}}</span>
                         <span v-else-if="colConfig.prop.split('.').length===2"   > {{row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]]?row[colConfig.prop.split('.')[0]][colConfig.prop.split('.')[1]]:'--'}}</span>
                         <span v-else-if="colConfig.prop.split('.').length===1"  >{{row[colConfig.prop]?row[colConfig.prop]:'--'}}</span>
@@ -85,6 +92,12 @@ export default {
 	},
 
 	computed:{
+        getBooleanText(){
+            return (val)=>{
+                let obj={true:'真',false:'假'}
+                return obj[val]||''
+            }
+        },
         dataType(){
           return Array.isArray(this.data)
         },
@@ -124,7 +137,7 @@ export default {
                 :this.cloneData.shift()
 
         },
-        searchData(type,data){
+        searchData(type,data,configType){
             if(!this.dataType){
                 this.$message.info('暂不支持 分页 搜索')
                 return
@@ -132,36 +145,47 @@ export default {
             console.log(type, data);
 
             if(type=='fuzzy'){
-                this.filterAllFuzzy(data)
+                //参数定义 高级搜索
+                this.filterAllFuzzy(data,configType)
             }else if(type=='input'){
-               this.fileterProp(data)
+                // 列表列搜索
+               this.fileterProp(configType)
             } else{
-                this.otherSearch(data)
+                //参数定义 高级搜索  数据不一样 单独处理
+                this.otherSearch(data,configType)
             }
         },
-        filterAllFuzzy(value){
+        filterAllFuzzy(value,type){
             if(!value){
                 this.cloneData=this.getCloneData([...this.data])
                 return
             }
+            let obj={'false':'假','true':"真"}
             let arr=[]
             map(this.data,(k)=>{
-               let blo= this.propArr.some((key)=>{
-
-                   return k[key]&&k[key].includes(value)
+               let blo= this.propArr.some((k1)=>{
+                   let s=k[k1.prop]
+                    if(k1.type=='bool'){
+                       s=obj[s]||''
+                   }
+                    return s&&s.includes(value)
                 })
                 blo&&arr.push(k)
             })
             this.cloneData=this.getCloneData(arr)
         },
-        fileterProp(){
+        fileterProp(type){
             let arr=[]
+            let obj={'false':'假','true':"真"}
              map(this.data,(k)=>{
                 let blo=true
                 map(this.rowObj,(value,key)=>{
                     let s=k[key]
                     if(!value){
                         return
+                    }
+                    if(type=='bool'){
+                        s=obj[s]||''
                     }
                     if(!s||(s&&!s.includes(value))){
                        blo=false
@@ -172,27 +196,29 @@ export default {
             this.cloneData=this.getCloneData(arr)
         },
         otherSearch(value){
-            console.log(value,this.data,this.tableConfig);
-            if(!value){
+             if(!value){
                 this.cloneData=this.getCloneData([...this.data])
                 return
             }
             let arr=[]
-            // console.log(this.getForData);
+            let obj={'false':'假','true':"真"}
+
             map(this.data,(k)=>{
-                console.log(this.tableConfig);
-                let blo= this.tableConfig.some((kc)=>{
+                 let blo= this.tableConfig.some((kc)=>{
                      if(kc.prop){
                          if(kc.filterList__){
+                             //列表 字段展示 经过转换的
                             let code=k[kc.prop]
                             let val=''
                             kc.filterList__().filter(k=>{
                                 k.code==code?(val=k.name):''
                                 return k.code==code
                             })
-                            return val.includes(value)
+                             // console.log(1,val);
+                             return val.includes(value)
                         }
-                        return k[kc.prop]&&k[kc.prop].includes(value)
+                         // console.log(k[kc.prop]);
+                         return k[kc.prop]&&k[kc.prop].includes(value)
                     }
                     return false
                 })
@@ -300,7 +326,7 @@ export default {
 			//let parentHeight=this.$refs.fTableWrapper.parentNode.offsetHeight;
 			this.getHeight();
             map(this.tableConfig,(k)=>{
-                k.type=='text'&& this.propArr.push(k.prop)
+                (k.type=='text'||k.type=='bool')&& this.propArr.push(k)
             })
 		});
 
