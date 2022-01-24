@@ -33,7 +33,7 @@
                 <el-button @click="copyData(item.value,'copyText'+index)" >复制数据</el-button>
                 <el-button @click="handleMap1({...item,row:item,id:form.id})" v-if="showCoordinatesBt(item)">选取坐标</el-button>
             </template>
-            <el-radio-group v-model="item.value"    v-else-if="item.type=='bool'">
+            <el-radio-group :class="item.type" v-model="item.value"    v-else-if="item.type=='bool'">
                 <el-radio label="true">真</el-radio>
                 <el-radio label="false">假</el-radio>
             </el-radio-group>
