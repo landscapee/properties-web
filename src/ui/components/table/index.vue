@@ -94,7 +94,7 @@ export default {
 	computed:{
         getBooleanText(){
             return (val)=>{
-                let obj={true:'真',false:'假'}
+                let obj={true:'是',false:'否'}
                 return obj[val]||''
             }
         },
@@ -160,7 +160,7 @@ export default {
                 this.cloneData=this.getCloneData([...this.data])
                 return
             }
-            let obj={'false':'假','true':"真"}
+            let obj={'false':'否','true':"是"}
             let arr=[]
             map(this.data,(k)=>{
                let blo= this.propArr.some((k1)=>{
@@ -176,7 +176,7 @@ export default {
         },
         fileterProp(type){
             let arr=[]
-            let obj={'false':'假','true':"真"}
+            let obj={'false':'否','true':"是"}
              map(this.data,(k)=>{
                 let blo=true
                 map(this.rowObj,(value,key)=>{
@@ -201,7 +201,7 @@ export default {
                 return
             }
             let arr=[]
-            let obj={'false':'假','true':"真"}
+            let obj={'false':'否','true':"是"}
 
             map(this.data,(k)=>{
                  let blo= this.tableConfig.some((kc)=>{

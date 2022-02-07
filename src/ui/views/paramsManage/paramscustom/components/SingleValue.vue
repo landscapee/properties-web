@@ -17,7 +17,12 @@
         { required: true, message: '请输入', trigger: 'blur' },
         ]"
     >
-         <el-input :disabled="!editable" v-model="item.value"  placeholder="请输入"></el-input>
+        <el-radio-group v-model="item.value"  :disabled="!editable"   v-if="item.type=='boolean'">
+            <el-radio label="true">是</el-radio>
+            <el-radio label="false">否</el-radio>
+        </el-radio-group>
+        <el-input v-else :disabled="!editable" v-model="item.value"  placeholder="请输入"></el-input>
+
     </el-form-item>
 
     <el-form-item label="" v-if="editable">

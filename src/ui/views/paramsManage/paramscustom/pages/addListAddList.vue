@@ -27,8 +27,8 @@
                 </el-option>
             </el-select>
             <el-radio-group v-model="item.value"    v-else-if="item.type=='bool'">
-                <el-radio label="true">真</el-radio>
-                <el-radio label="false">假</el-radio>
+                <el-radio label="true">是</el-radio>
+                <el-radio label="false">否</el-radio>
             </el-radio-group>
             <template v-else-if="showCoordinatesBt(item)">
                 <input   v-model="item.value"  :ref="'copyText'+index"  class="copy-txt"  >
